@@ -6,6 +6,10 @@ set -e
 
 cd "$(dirname "$0")"
 
+# Clean up any existing containers and volumes
+echo "Cleaning up existing containers..."
+docker compose down -v 2>/dev/null || true
+
 echo "Starting Flagsmith service..."
 docker compose up -d
 
