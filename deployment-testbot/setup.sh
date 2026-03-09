@@ -14,10 +14,7 @@ echo "Starting Flagsmith service..."
 docker compose up -d
 
 echo "Waiting for service to be ready..."
-sleep 20
-
-echo "Running database migrations..."
-docker compose exec -T flagsmith python manage.py migrate
+sleep 30
 
 echo "Creating admin user..."
 docker compose exec -T flagsmith python manage.py createsuperuser \
