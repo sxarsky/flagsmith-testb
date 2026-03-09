@@ -85,3 +85,7 @@ Thank you to the open source community for your contributions and for building t
 </a>
 
 Made with [contrib.rocks](https://contrib.rocks).
+
+## TestBot Integration
+
+This fork includes Skyramp TestBot integration for automated test maintenance. The TestBot workflow is configured to run on pull requests to help maintain and update tests as the codebase evolves.
