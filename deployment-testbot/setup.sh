@@ -13,8 +13,17 @@ docker compose down -v 2>/dev/null || true
 echo "Starting Flagsmith service..."
 docker compose up -d
 
-echo "Waiting for service to be ready..."
-sleep 30
+echo "Waiting for service to be ready (including migrations)..."
+for i in {1..60}; do
+  if curl -sf http://localhost:8080/health > /dev/null 2>&1; then
+    echo "Service ready after $i attempts ($(($i * 2)) seconds)"
+    break
+  fi
+  if [ $i -eq 60 ]; then
+    echo "Warning: Service did not become ready within 120 seconds"
+  fi
+  sleep 2
+done
 
 echo "Creating admin user..."
 docker compose exec -T flagsmith python manage.py createsuperuser \
