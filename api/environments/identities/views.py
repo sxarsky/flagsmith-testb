@@ -34,6 +34,7 @@ from environments.sdk.serializers import (
     IdentitySerializerWithTraitsAndSegments,
 )
 from features.serializers import SDKFeatureStateSerializer
+from features.budgets.models import FeatureBudget
 from integrations.integration import identify_integrations
 from util.views import SDKAPIView
 
@@ -315,6 +316,19 @@ class SDKIdentities(SDKAPIView):
         all_feature_states = identity.get_all_feature_states(
             additional_filters=self._get_additional_filters(),
         )
+
+        # Track budget usage for evaluated features
+        for feature_state in all_feature_states:
+            try:
+                budget = FeatureBudget.objects.select_for_update().get(
+                    feature=feature_state.feature
+                )
+                budget.check_and_reset_if_needed()
+                budget.increment_count()
+            except FeatureBudget.DoesNotExist:
+                # No budget configured for this feature, continue
+                pass
+
         serializer_class = self.get_serializer_class()
         serializer = serializer_class(
             {
