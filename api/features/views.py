@@ -333,6 +333,20 @@ class FeatureViewSet(viewsets.ModelViewSet):  # type: ignore[type-arg]
         self._trigger_feature_state_change_webhooks(feature_states)
         instance.delete()
 
+    @action(detail=False, methods=["GET"], url_path="summary")
+    def summary(self, request, project_pk):  # type: ignore[no-untyped-def]
+        queryset = self.get_queryset()
+        return Response(
+            {
+                "total": queryset.count(),
+                "server_key_only": queryset.filter(is_server_key_only=True).count(),
+                "by_type": {
+                    "STANDARD": queryset.filter(type="STANDARD").count(),
+                    "MULTIVARIATE": queryset.filter(type="MULTIVARIATE").count(),
+                },
+            }
+        )
+
     def get_serializer_context(self):  # type: ignore[no-untyped-def]
         context = super().get_serializer_context()
         feature_states = getattr(self, "_feature_states", {})
