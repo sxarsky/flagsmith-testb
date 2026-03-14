@@ -339,6 +339,7 @@ class FeatureViewSet(viewsets.ModelViewSet):  # type: ignore[type-arg]
         return Response(
             {
                 "total": queryset.count(),
+                "archived": queryset.filter(is_archived=True).count(),
                 "server_key_only": queryset.filter(is_server_key_only=True).count(),
                 "by_type": {
                     "STANDARD": queryset.filter(type="STANDARD").count(),
