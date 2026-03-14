@@ -1,0 +1,106 @@
+[
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"name\": \"feature_standard_test_1\", \"type\": \"STANDARD\", \"is_server_key_only\": false}",
+    "ResponseBody": "{\"id\": 1001, \"name\": \"feature_standard_test_1\", \"type\": \"STANDARD\", \"is_server_key_only\": false, \"project\": 1, \"created_date\": \"2026-03-14T00:00:00Z\", \"description\": null, \"initial_value\": null, \"default_enabled\": false, \"archived\": false}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        ""
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "POST",
+    "Path": "/api/v1/projects/1/features/",
+    "QueryParams": {},
+    "StatusCode": 201,
+    "Port": 8000,
+    "Timestamp": "2026-03-14T17:08:20.576Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"name\": \"feature_server_key_test_1\", \"type\": \"STANDARD\", \"is_server_key_only\": true}",
+    "ResponseBody": "{\"id\": 1002, \"name\": \"feature_server_key_test_1\", \"type\": \"STANDARD\", \"is_server_key_only\": true, \"project\": 1, \"created_date\": \"2026-03-14T00:00:01Z\", \"description\": null, \"initial_value\": null, \"default_enabled\": false, \"archived\": false}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        ""
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "POST",
+    "Path": "/api/v1/projects/1/features/",
+    "QueryParams": {},
+    "StatusCode": 201,
+    "Port": 8000,
+    "Timestamp": "2026-03-14T17:08:25.752Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"name\": \"feature_multivariate_test_1\", \"type\": \"MULTIVARIATE\", \"is_server_key_only\": false}",
+    "ResponseBody": "{\"id\": 1003, \"name\": \"feature_multivariate_test_1\", \"type\": \"MULTIVARIATE\", \"is_server_key_only\": false, \"project\": 1, \"created_date\": \"2026-03-14T00:00:02Z\", \"description\": null, \"initial_value\": null, \"default_enabled\": false, \"archived\": false}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        ""
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "POST",
+    "Path": "/api/v1/projects/1/features/",
+    "QueryParams": {},
+    "StatusCode": 201,
+    "Port": 8000,
+    "Timestamp": "2026-03-14T17:08:30.934Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "",
+    "ResponseBody": "{\"total\": 3, \"server_key_only\": 1, \"by_type\": {\"STANDARD\": 2, \"MULTIVARIATE\": 1}}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        ""
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "GET",
+    "Path": "/api/v1/projects/1/features/summary/",
+    "QueryParams": {},
+    "StatusCode": 200,
+    "Port": 8000,
+    "Timestamp": "2026-03-14T17:08:36.170Z",
+    "Scheme": "http"
+  }
+]
