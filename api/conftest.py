@@ -4,7 +4,19 @@ import site
 import typing
 from unittest.mock import MagicMock
 
-import boto3
+# Optional AWS dependencies - not required for all test scenarios
+try:
+    import boto3
+    from moto import mock_dynamodb  # type: ignore[import-untyped]
+    from mypy_boto3_dynamodb.service_resource import DynamoDBServiceResource, Table
+    HAS_AWS_SUPPORT = True
+except ImportError:
+    boto3 = None  # type: ignore[assignment]
+    mock_dynamodb = None  # type: ignore[assignment]
+    DynamoDBServiceResource = None  # type: ignore[misc,assignment]
+    Table = None  # type: ignore[misc,assignment]
+    HAS_AWS_SUPPORT = False
+
 import pytest
 from common.environments.permissions import (
     MANAGE_IDENTITIES,
@@ -21,8 +33,6 @@ from django.test.utils import setup_databases
 from flag_engine.segments.constants import EQUAL
 from flagsmith import Flagsmith
 from flagsmith.models import Flags
-from moto import mock_dynamodb  # type: ignore[import-untyped]
-from mypy_boto3_dynamodb.service_resource import DynamoDBServiceResource, Table
 from pyfakefs.fake_filesystem import FakeFilesystem
 from pytest import FixtureRequest
 from pytest_django.fixtures import SettingsWrapper
@@ -1067,6 +1077,8 @@ def aws_credentials():  # type: ignore[no-untyped-def]
 
 @pytest.fixture()
 def dynamodb(aws_credentials):  # type: ignore[no-untyped-def]
+    if not HAS_AWS_SUPPORT:
+        pytest.skip("AWS support (boto3/moto) not available")
     # TODO: move all wrapper tests to using moto
     with mock_dynamodb():
         yield boto3.resource("dynamodb")
@@ -1076,6 +1088,8 @@ def dynamodb(aws_credentials):  # type: ignore[no-untyped-def]
 def flagsmith_identities_table(
     dynamodb: DynamoDBServiceResource, settings: SettingsWrapper
 ) -> Table:
+    if not HAS_AWS_SUPPORT:
+        pytest.skip("AWS support (boto3/moto) not available")
     table = dynamodb.create_table(
         TableName="flagsmith_identities",
         KeySchema=[
@@ -1127,6 +1141,8 @@ def flagsmith_identities_table(
 
 @pytest.fixture()
 def flagsmith_environments_v2_table(dynamodb: DynamoDBServiceResource) -> Table:
+    if not HAS_AWS_SUPPORT:
+        pytest.skip("AWS support (boto3/moto) not available")
     return dynamodb.create_table(
         TableName="flagsmith_environments_v2",
         KeySchema=[
