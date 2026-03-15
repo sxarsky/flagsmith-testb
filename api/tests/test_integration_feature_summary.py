@@ -86,6 +86,9 @@ def test_integration():
     )
     # Generated Assertions
     assert endpoint_2_GET_response.status_code == 200
+    summary_data = endpoint_2_GET_response.json()
+    assert "archived" in summary_data
+    assert summary_data["archived"] == 0
 
 if __name__ == "__main__":
     test_integration()

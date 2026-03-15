@@ -47,6 +47,10 @@ def test_summary_get():
 
     # Generated Assertions
     assert skyramp.check_status_code(summary_GET_response, "20x")
+    summary_data = summary_GET_response.json()
+    assert "archived" in summary_data
+    assert isinstance(summary_data["archived"], int)
+    assert summary_data["archived"] >= 0
 
     client.remove_all_mocks()
 
