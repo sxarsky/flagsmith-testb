@@ -4,7 +4,7 @@ from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from environments.identities.models import Identity
+from environments.identities.models import Identity, IdentityTraitHistory
 from environments.models import Environment
 from environments.serializers import EnvironmentSerializerFull
 from features.models import FeatureState
@@ -133,3 +133,9 @@ class IdentitySourceIdentityRequestSerializer(serializers.Serializer):  # type: 
         required=True,
         help_text="ID of the source identity to clone feature states from.",
     )
+
+
+class IdentityTraitHistorySerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
+    class Meta:
+        model = IdentityTraitHistory
+        fields = '__all__'

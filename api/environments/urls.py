@@ -28,7 +28,7 @@ from integrations.slack.views import (
 from integrations.webhook.views import WebhookConfigurationViewSet
 
 from .identities.traits.views import TraitViewSet
-from .identities.views import IdentityViewSet
+from .identities.views import IdentityTraitHistoryViewSet, IdentityViewSet
 from .permissions.views import (
     UserEnvironmentPermissionsViewSet,
     UserPermissionGroupEnvironmentPermissionsViewSet,
@@ -143,6 +143,10 @@ identity_router.register(
 )
 
 identity_router.register(r"traits", TraitViewSet, basename="identities-traits")
+
+identity_router.register(
+    r"trait-history", IdentityTraitHistoryViewSet, basename="identity-trait-history"
+)
 
 environments_router.register(r"api-keys", EnvironmentAPIKeyViewSet, basename="api-keys")
 

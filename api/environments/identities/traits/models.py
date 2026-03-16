@@ -2,6 +2,8 @@ import typing
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from core.constants import BOOLEAN, FLOAT, INTEGER, STRING
 from environments.identities.traits.exceptions import TraitPersistenceError
@@ -130,3 +132,37 @@ class Trait(models.Model):
             )
 
         return super(Trait, self).save(*args, **kwargs)
+
+
+@receiver(post_save, sender=Trait)
+def record_trait_change(sender, instance, created, **kwargs):  # type: ignore[no-untyped-def]
+    """
+    Record trait changes in the IdentityTraitHistory model.
+    """
+    # Avoid circular import
+    from environments.identities.models import IdentityTraitHistory
+
+    # Skip history recording for transient traits
+    if instance.transient:
+        return
+
+    # Get old value if updating existing trait
+    old_value = None
+    if not created:
+        try:
+            # Try to get the previous value from the database
+            old_trait = Trait.objects.filter(pk=instance.pk).first()
+            if old_trait:
+                old_value = str(old_trait.trait_value) if old_trait.trait_value is not None else None
+        except Exception:
+            # If we can't get the old value, just record the new value
+            pass
+
+    # Record the change
+    IdentityTraitHistory.objects.create(
+        identity=instance.identity,
+        trait_key=instance.trait_key,
+        old_value=old_value,
+        new_value=str(instance.trait_value) if instance.trait_value is not None else "",
+        changed_by="api",  # Default to "api" - can be enhanced to track actual source
+    )
