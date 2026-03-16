@@ -1170,3 +1170,55 @@ class FeatureStateValue(
 
     def _get_environment(self) -> typing.Optional["Environment"]:
         return self.feature_state.environment
+
+
+class FeatureHealthStatus(models.Model):
+    """
+    Tracks health metrics for feature flags.
+    Engineering teams can detect flags that are causing errors, have unusual evaluation patterns,
+    or haven't been evaluated in a long time (zombie flags).
+    """
+    feature = models.ForeignKey(
+        Feature,
+        on_delete=models.CASCADE,
+        related_name='health_status'
+    )
+    environment = models.ForeignKey(
+        'environments.Environment',
+        on_delete=models.CASCADE,
+        related_name='feature_health_statuses'
+    )
+    health_score = models.IntegerField(
+        default=100,
+        help_text="Overall health score 0-100 (100 is perfect health)"
+    )
+    last_evaluated = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Last time this flag was evaluated"
+    )
+    evaluation_error_rate = models.FloatField(
+        default=0.0,
+        help_text="Percentage of evaluations that resulted in errors"
+    )
+    days_since_last_change = models.IntegerField(
+        default=0,
+        help_text="Days since the flag was last modified"
+    )
+    is_zombie = models.BooleanField(
+        default=False,
+        help_text="True if flag hasn't been evaluated in 30+ days"
+    )
+    alert_triggered = models.BooleanField(
+        default=False,
+        help_text="True if health alerts have been triggered"
+    )
+    last_check_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'feature_health_status'
+        unique_together = [['feature', 'environment']]
+
+    def __str__(self):
+        return f"Health for {self.feature.name} in {self.environment.name} - Score: {self.health_score}"
