@@ -36,6 +36,8 @@ def test_integration():
     )
     # Generated Assertions
     assert endpoint_1_GET_response.status_code == 200
+    assert "rollout_percentage" in skyramp.get_response_value(endpoint_1_GET_response, "0")
+    assert "rollout_strategy" in skyramp.get_response_value(endpoint_1_GET_response, "0")
 
     # Execute Request
     endpoint_2_GET_response = client.send_request(
@@ -47,6 +49,8 @@ def test_integration():
     )
     # Generated Assertions
     assert endpoint_2_GET_response.status_code == 200
+    assert "rollout_percentage" in skyramp.get_response_value(endpoint_2_GET_response, "")
+    assert "rollout_strategy" in skyramp.get_response_value(endpoint_2_GET_response, "")
 
     # Request Body
     endpoint_4_PATCH_request_body = r'''{
@@ -64,6 +68,7 @@ def test_integration():
     )
     # Generated Assertions
     assert endpoint_4_PATCH_response.status_code == 200
+    assert skyramp.get_response_value(endpoint_4_PATCH_response, "rollout_percentage") == 10
 
     # Request Body
     endpoint_3_POST_request_body = r'''{
@@ -81,6 +86,7 @@ def test_integration():
     )
     # Generated Assertions
     assert endpoint_3_POST_response.status_code == 200
+    assert skyramp.get_response_value(endpoint_3_POST_response, "rollout_percentage") == 50
 
 
 if __name__ == "__main__":
