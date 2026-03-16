@@ -1,0 +1,106 @@
+[
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"feature\": 1, \"cost_per_evaluation\": \"0.000100\", \"fixed_monthly_cost\": \"150.00\", \"cost_category\": \"compute\", \"currency\": \"USD\", \"notes\": \"EC2 instance costs for flag evaluation\"}",
+    "ResponseBody": "{\"id\": 1, \"feature\": 1, \"feature_name\": \"my_feature\", \"cost_per_evaluation\": \"0.000100\", \"fixed_monthly_cost\": \"150.00\", \"cost_category\": \"compute\", \"currency\": \"USD\", \"notes\": \"EC2 instance costs for flag evaluation\", \"created_at\": \"2026-03-16T00:00:00Z\", \"updated_at\": \"2026-03-16T00:00:00Z\"}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Bearer SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "POST",
+    "Path": "/api/v1/features/cost-profiles/",
+    "QueryParams": {},
+    "StatusCode": 201,
+    "Port": 8000,
+    "Timestamp": "2026-03-16T22:47:00.387Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "",
+    "ResponseBody": "{\"id\": 1, \"feature\": 1, \"feature_name\": \"my_feature\", \"cost_per_evaluation\": \"0.000100\", \"fixed_monthly_cost\": \"150.00\", \"cost_category\": \"compute\", \"currency\": \"USD\", \"notes\": \"EC2 instance costs for flag evaluation\", \"created_at\": \"2026-03-16T00:00:00Z\", \"updated_at\": \"2026-03-16T00:00:00Z\"}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Bearer SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "GET",
+    "Path": "/api/v1/features/cost-profiles/1/",
+    "QueryParams": {},
+    "StatusCode": 200,
+    "Port": 8000,
+    "Timestamp": "2026-03-16T22:47:05.533Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"feature\": 1, \"cost_per_evaluation\": \"0.000200\", \"fixed_monthly_cost\": \"275.50\", \"cost_category\": \"storage\", \"currency\": \"USD\", \"notes\": \"Updated S3 storage costs for flag evaluation\"}",
+    "ResponseBody": "{\"id\": 1, \"feature\": 1, \"feature_name\": \"my_feature\", \"cost_per_evaluation\": \"0.000200\", \"fixed_monthly_cost\": \"275.50\", \"cost_category\": \"storage\", \"currency\": \"USD\", \"notes\": \"Updated S3 storage costs for flag evaluation\", \"created_at\": \"2026-03-16T00:00:00Z\", \"updated_at\": \"2026-03-16T00:01:00Z\"}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Bearer SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "PUT",
+    "Path": "/api/v1/features/cost-profiles/1/",
+    "QueryParams": {},
+    "StatusCode": 200,
+    "Port": 8000,
+    "Timestamp": "2026-03-16T22:47:11.761Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "",
+    "ResponseBody": "{\"total_fixed_monthly\": \"275.50\", \"by_category\": {\"storage\": {\"total_fixed_monthly\": \"275.50\", \"feature_count\": 1}}}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Bearer SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "GET",
+    "Path": "/api/v1/features/cost-profiles/summary/",
+    "QueryParams": {},
+    "StatusCode": 200,
+    "Port": 8000,
+    "Timestamp": "2026-03-16T22:47:18.266Z",
+    "Scheme": "http"
+  }
+]
