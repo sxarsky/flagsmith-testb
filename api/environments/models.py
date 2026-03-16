@@ -112,6 +112,7 @@ class Environment(
     )
 
     minimum_change_request_approvals = models.IntegerField(blank=True, null=True)  # type: ignore[var-annotated]
+    requires_approval = models.BooleanField(default=False)  # type: ignore[var-annotated]
 
     webhooks_enabled = models.BooleanField(default=False, help_text="DEPRECATED FIELD.")  # type: ignore[var-annotated]  # noqa: E501
     webhook_url = models.URLField(null=True, blank=True, help_text="DEPRECATED FIELD.")  # type: ignore[var-annotated]

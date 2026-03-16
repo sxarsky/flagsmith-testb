@@ -69,7 +69,7 @@ from webhooks.webhooks import WebhookEventType
 
 from .constants import INTERSECTION, UNION
 from .features_service import get_overrides_data
-from .models import Feature, FeatureSegment, FeatureState
+from .models import Feature, FeatureSegment, FeatureState, FeatureCostProfile
 from .multivariate.serializers import (
     FeatureMVOptionsValuesResponseSerializer,
 )
@@ -83,6 +83,7 @@ from .permissions import (
 from .serializers import (  # type: ignore[attr-defined]
     CreateFeatureSerializer,
     CustomCreateSegmentOverrideFeatureStateSerializer,
+    FeatureCostProfileSerializer,
     FeatureEvaluationDataSerializer,
     FeatureGroupOwnerInputSerializer,
     FeatureInfluxDataSerializer,
@@ -1120,3 +1121,324 @@ def create_segment_override(  # type: ignore[no-untyped-def]
     serializer.is_valid(raise_exception=True)
     serializer.save(environment=environment, feature=feature)  # type: ignore[no-untyped-call]
     return Response(serializer.data, status=201)
+
+
+class FeatureChangeRequestViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for managing feature flag approval workflow.
+    """
+    serializer_class = None  # Will be set dynamically
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        from .models import FeatureChangeRequest
+        environment_id = self.kwargs.get('environment_pk')
+        if environment_id:
+            return FeatureChangeRequest.objects.filter(environment_id=environment_id)
+        return FeatureChangeRequest.objects.all()
+
+    def get_serializer_class(self):
+        from .serializers import FeatureChangeRequestSerializer
+        return FeatureChangeRequestSerializer
+
+    @action(detail=False, methods=['post'])
+    def request_change(self, request, environment_pk=None):
+        """Request a change to a feature flag in a production environment."""
+        from .models import FeatureChangeRequest
+        from .serializers import FeatureChangeRequestSerializer
+        
+        environment = get_object_or_404(Environment, pk=environment_pk)
+        
+        if not environment.requires_approval:
+            return Response(
+                {'error': 'This environment does not require approval'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        serializer = FeatureChangeRequestSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(
+                requested_by=request.user,
+                environment=environment,
+                status='pending'
+            )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['get'])
+    def pending(self, request, environment_pk=None):
+        """Get all pending change requests for an environment."""
+        from .models import FeatureChangeRequest
+        from .serializers import FeatureChangeRequestSerializer
+        
+        environment = get_object_or_404(Environment, pk=environment_pk)
+        pending_requests = FeatureChangeRequest.objects.filter(
+            environment=environment,
+            status='pending'
+        )
+        serializer = FeatureChangeRequestSerializer(pending_requests, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['post'])
+    def approve(self, request, pk=None, environment_pk=None):
+        """Approve a change request and apply the changes."""
+        from .models import FeatureChangeRequest
+        from .serializers import FeatureChangeRequestSerializer
+        from django.utils import timezone
+        
+        change_request = get_object_or_404(FeatureChangeRequest, pk=pk, environment_id=environment_pk)
+        
+        if change_request.status != 'pending':
+            return Response(
+                {'error': 'Change request is not pending'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Apply the requested changes
+        requested_change = change_request.requested_change
+        feature = change_request.feature
+        environment = change_request.environment
+        
+        # Get or create feature state for this environment
+        feature_state = FeatureState.objects.filter(
+            feature=feature,
+            environment=environment,
+            identity__isnull=True,
+            feature_segment__isnull=True
+        ).first()
+        
+        if feature_state:
+            if 'enabled' in requested_change:
+                feature_state.enabled = requested_change['enabled']
+            if 'value' in requested_change:
+                feature_state.feature_state_value.string_value = str(requested_change['value'])
+                feature_state.feature_state_value.save()
+            feature_state.save()
+        
+        # Update change request status
+        change_request.status = 'approved'
+        change_request.reviewed_by = request.user
+        change_request.reviewed_at = timezone.now()
+        change_request.save()
+        
+        serializer = FeatureChangeRequestSerializer(change_request)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['post'])
+    def reject(self, request, pk=None, environment_pk=None):
+        """Reject a change request."""
+        from .models import FeatureChangeRequest
+        from .serializers import FeatureChangeRequestSerializer
+        from django.utils import timezone
+        
+        change_request = get_object_or_404(FeatureChangeRequest, pk=pk, environment_id=environment_pk)
+        
+        if change_request.status != 'pending':
+            return Response(
+                {'error': 'Change request is not pending'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        change_request.status = 'rejected'
+        change_request.reviewed_by = request.user
+        change_request.reviewed_at = timezone.now()
+        change_request.save()
+        
+        serializer = FeatureChangeRequestSerializer(change_request)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'])
+    def history(self, request, environment_pk=None):
+        """Get change request history for an environment."""
+        from .models import FeatureChangeRequest
+        from .serializers import FeatureChangeRequestSerializer
+        
+        environment = get_object_or_404(Environment, pk=environment_pk)
+        history = FeatureChangeRequest.objects.filter(
+            environment=environment
+        ).order_by('-created_at')
+        serializer = FeatureChangeRequestSerializer(history, many=True)
+        return Response(serializer.data)
+
+
+class FeatureCostProfileViewSet(viewsets.ModelViewSet):  # type: ignore[type-arg]
+    """
+    ViewSet for managing feature cost profiles and calculating cost reports.
+    """
+    serializer_class = FeatureCostProfileSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self) -> QuerySet:  # type: ignore[type-arg]
+        """
+        Get cost profiles filtered by project or feature.
+        """
+        project_id = self.kwargs.get("project_pk")
+        feature_id = self.kwargs.get("feature_pk")
+
+        queryset = FeatureCostProfile.objects.select_related("feature")
+
+        if feature_id:
+            queryset = queryset.filter(feature_id=feature_id)
+        elif project_id:
+            queryset = queryset.filter(feature__project_id=project_id)
+
+        return queryset
+
+    @action(detail=False, methods=["POST"], url_path="set-cost")
+    def set_cost_profile(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
+        """
+        Set or update cost profile for a feature.
+        """
+        feature_id = self.kwargs.get("feature_pk")
+        if not feature_id:
+            feature_id = request.data.get("feature")
+
+        if not feature_id:
+            return Response(
+                {"error": "feature_id is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Get or create cost profile
+        cost_profile, created = FeatureCostProfile.objects.get_or_create(
+            feature_id=feature_id,
+            defaults={
+                "cost_per_evaluation": request.data.get("cost_per_evaluation", 0),
+                "fixed_monthly_cost": request.data.get("fixed_monthly_cost", 0),
+                "cost_category": request.data.get("cost_category", "compute"),
+                "currency": request.data.get("currency", "USD"),
+            }
+        )
+
+        if not created:
+            # Update existing profile
+            for field in ["cost_per_evaluation", "fixed_monthly_cost", "cost_category", "currency"]:
+                if field in request.data:
+                    setattr(cost_profile, field, request.data[field])
+            cost_profile.save()
+
+        serializer = self.get_serializer(cost_profile)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=["GET"], url_path="estimate")
+    def cost_estimate(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
+        """
+        Calculate cost estimate for a feature based on projected evaluations.
+        """
+        feature_id = self.kwargs.get("feature_pk")
+        projected_evaluations = int(request.query_params.get("projected_evaluations", 0))
+
+        if not feature_id:
+            return Response(
+                {"error": "feature_id is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            cost_profile = FeatureCostProfile.objects.get(feature_id=feature_id)
+        except FeatureCostProfile.DoesNotExist:
+            return Response(
+                {"error": "Cost profile not found for this feature"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        # Calculate costs
+        variable_cost = float(cost_profile.cost_per_evaluation) * projected_evaluations
+        fixed_cost = float(cost_profile.fixed_monthly_cost)
+        total_cost = variable_cost + fixed_cost
+
+        return Response({
+            "feature_id": feature_id,
+            "projected_evaluations": projected_evaluations,
+            "variable_cost": variable_cost,
+            "fixed_cost": fixed_cost,
+            "total_cost": total_cost,
+            "currency": cost_profile.currency,
+            "cost_category": cost_profile.cost_category,
+        })
+
+    @action(detail=False, methods=["GET"], url_path="project-report")
+    def project_cost_report(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
+        """
+        Get aggregated cost report for all features in a project.
+        """
+        project_id = self.kwargs.get("project_pk")
+
+        if not project_id:
+            return Response(
+                {"error": "project_id is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        cost_profiles = FeatureCostProfile.objects.filter(
+            feature__project_id=project_id
+        ).select_related("feature")
+
+        total_fixed_cost = sum(float(cp.fixed_monthly_cost) for cp in cost_profiles)
+
+        features_cost_data = []
+        for cp in cost_profiles:
+            features_cost_data.append({
+                "feature_id": cp.feature_id,
+                "feature_name": cp.feature.name,
+                "cost_per_evaluation": float(cp.cost_per_evaluation),
+                "fixed_monthly_cost": float(cp.fixed_monthly_cost),
+                "cost_category": cp.cost_category,
+                "currency": cp.currency,
+            })
+
+        return Response({
+            "project_id": project_id,
+            "total_fixed_monthly_cost": total_fixed_cost,
+            "features_count": len(features_cost_data),
+            "features": features_cost_data,
+        })
+
+    @action(detail=False, methods=["GET"], url_path="org-summary")
+    def org_cost_summary(self, request, *args, **kwargs):  # type: ignore[no-untyped-def]
+        """
+        Get organization-level cost summary across all projects.
+        """
+        organisation_id = request.query_params.get("organisation_id")
+
+        if not organisation_id:
+            return Response(
+                {"error": "organisation_id is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        cost_profiles = FeatureCostProfile.objects.filter(
+            feature__project__organisation_id=organisation_id
+        ).select_related("feature", "feature__project")
+
+        total_fixed_cost = sum(float(cp.fixed_monthly_cost) for cp in cost_profiles)
+
+        # Group by project
+        projects_cost = {}
+        for cp in cost_profiles:
+            project_id = cp.feature.project_id
+            if project_id not in projects_cost:
+                projects_cost[project_id] = {
+                    "project_id": project_id,
+                    "project_name": cp.feature.project.name,
+                    "fixed_cost": 0,
+                    "features_count": 0,
+                }
+            projects_cost[project_id]["fixed_cost"] += float(cp.fixed_monthly_cost)
+            projects_cost[project_id]["features_count"] += 1
+
+        # Group by cost category
+        category_costs = {}
+        for cp in cost_profiles:
+            category = cp.cost_category
+            if category not in category_costs:
+                category_costs[category] = 0
+            category_costs[category] += float(cp.fixed_monthly_cost)
+
+        return Response({
+            "organisation_id": organisation_id,
+            "total_fixed_monthly_cost": total_fixed_cost,
+            "total_features_with_cost_tracking": len(cost_profiles),
+            "projects": list(projects_cost.values()),
+            "cost_by_category": category_costs,
+        })
