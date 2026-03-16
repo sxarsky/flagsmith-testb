@@ -69,7 +69,7 @@ from webhooks.webhooks import WebhookEventType
 
 from .constants import INTERSECTION, UNION
 from .features_service import get_overrides_data
-from .models import Feature, FeatureSegment, FeatureState
+from .models import Feature, FeatureChangeRequest, FeatureSegment, FeatureState
 from .multivariate.serializers import (
     FeatureMVOptionsValuesResponseSerializer,
 )
@@ -81,8 +81,10 @@ from .permissions import (
     IdentityFeatureStatePermissions,
 )
 from .serializers import (  # type: ignore[attr-defined]
+    ChangeRequestApprovalSerializer,
     CreateFeatureSerializer,
     CustomCreateSegmentOverrideFeatureStateSerializer,
+    FeatureChangeRequestSerializer,
     FeatureEvaluationDataSerializer,
     FeatureGroupOwnerInputSerializer,
     FeatureInfluxDataSerializer,
@@ -1120,3 +1122,101 @@ def create_segment_override(  # type: ignore[no-untyped-def]
     serializer.is_valid(raise_exception=True)
     serializer.save(environment=environment, feature=feature)  # type: ignore[no-untyped-call]
     return Response(serializer.data, status=201)
+
+
+class FeatureChangeRequestViewSet(viewsets.ModelViewSet):  # type: ignore[type-arg]
+    """
+    ViewSet for managing feature flag change requests requiring approval.
+
+    Endpoints:
+    - POST /api/v1/change-requests/ - Create a change request
+    - GET /api/v1/change-requests/ - List all change requests
+    - GET /api/v1/change-requests/pending/ - List pending requests
+    - GET /api/v1/change-requests/{id}/ - Get request details
+    - POST /api/v1/change-requests/{id}/approve/ - Approve a request
+    - POST /api/v1/change-requests/{id}/reject/ - Reject a request
+    """
+    serializer_class = FeatureChangeRequestSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):  # type: ignore[no-untyped-def]
+        queryset = FeatureChangeRequest.objects.all().select_related(
+            'feature', 'environment', 'requested_by', 'reviewed_by'
+        )
+
+        # Filter by feature if provided
+        feature_id = self.request.query_params.get('feature_id')
+        if feature_id:
+            queryset = queryset.filter(feature_id=feature_id)
+
+        # Filter by environment if provided
+        environment_id = self.request.query_params.get('environment_id')
+        if environment_id:
+            queryset = queryset.filter(environment_id=environment_id)
+
+        # Filter by status if provided
+        status = self.request.query_params.get('status')
+        if status:
+            queryset = queryset.filter(status=status)
+
+        return queryset
+
+    def perform_create(self, serializer):  # type: ignore[no-untyped-def]
+        serializer.save(requested_by=self.request.user)
+
+    @action(detail=False, methods=['get'], url_path='pending')
+    def pending(self, request):  # type: ignore[no-untyped-def]
+        """Get all pending change requests."""
+        queryset = self.get_queryset().filter(status='pending')
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['post'], url_path='approve')
+    def approve(self, request, pk=None):  # type: ignore[no-untyped-def]
+        """Approve a change request."""
+        change_request = self.get_object()
+
+        if change_request.status != 'pending':
+            return Response(
+                {'error': 'Only pending requests can be approved'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializer = ChangeRequestApprovalSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        change_request.status = 'approved'
+        change_request.reviewed_by = request.user
+        change_request.reviewed_at = timezone.now()
+        change_request.review_comment = serializer.validated_data.get('review_comment', '')
+        change_request.save()
+
+        return Response(
+            FeatureChangeRequestSerializer(change_request).data,
+            status=status.HTTP_200_OK
+        )
+
+    @action(detail=True, methods=['post'], url_path='reject')
+    def reject(self, request, pk=None):  # type: ignore[no-untyped-def]
+        """Reject a change request."""
+        change_request = self.get_object()
+
+        if change_request.status != 'pending':
+            return Response(
+                {'error': 'Only pending requests can be rejected'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializer = ChangeRequestApprovalSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        change_request.status = 'rejected'
+        change_request.reviewed_by = request.user
+        change_request.reviewed_at = timezone.now()
+        change_request.review_comment = serializer.validated_data.get('review_comment', '')
+        change_request.save()
+
+        return Response(
+            FeatureChangeRequestSerializer(change_request).data,
+            status=status.HTTP_200_OK
+        )
