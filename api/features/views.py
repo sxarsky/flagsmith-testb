@@ -98,6 +98,7 @@ from .serializers import (  # type: ignore[attr-defined]
     ProjectFeatureSerializer,
     SDKFeatureStateSerializer,
     SDKFeatureStatesQuerySerializer,
+    SegmentRolloutSerializer,
     UpdateFeatureSerializer,
     WritableNestedFeatureStateSerializer,
 )
@@ -1120,3 +1121,100 @@ def create_segment_override(  # type: ignore[no-untyped-def]
     serializer.is_valid(raise_exception=True)
     serializer.save(environment=environment, feature=feature)  # type: ignore[no-untyped-call]
     return Response(serializer.data, status=201)
+
+
+class SegmentRolloutViewSet(viewsets.ReadOnlyModelViewSet):  # type: ignore[type-arg]
+    """
+    ViewSet for managing segment-based rollout percentages.
+
+    Endpoints:
+    - GET /api/v1/segment-rollouts/ - List all segment rollouts
+    - GET /api/v1/segment-rollouts/{id}/ - Get specific rollout configuration
+    - PATCH /api/v1/segment-rollouts/{id}/update-percentage/ - Update rollout percentage
+    - POST /api/v1/segment-rollouts/{id}/increase/ - Gradually increase percentage
+    """
+    serializer_class = SegmentRolloutSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):  # type: ignore[no-untyped-def]
+        from .models import FeatureSegment
+
+        queryset = FeatureSegment.objects.all().select_related(
+            'feature', 'segment', 'environment'
+        )
+
+        # Filter by feature if provided
+        feature_id = self.request.query_params.get('feature_id')
+        if feature_id:
+            queryset = queryset.filter(feature_id=feature_id)
+
+        # Filter by segment if provided
+        segment_id = self.request.query_params.get('segment_id')
+        if segment_id:
+            queryset = queryset.filter(segment_id=segment_id)
+
+        # Filter by environment if provided
+        environment_id = self.request.query_params.get('environment_id')
+        if environment_id:
+            queryset = queryset.filter(environment_id=environment_id)
+
+        # Filter by rollout percentage range
+        min_percentage = self.request.query_params.get('min_percentage')
+        max_percentage = self.request.query_params.get('max_percentage')
+        if min_percentage:
+            queryset = queryset.filter(rollout_percentage__gte=int(min_percentage))
+        if max_percentage:
+            queryset = queryset.filter(rollout_percentage__lte=int(max_percentage))
+
+        return queryset
+
+    @action(detail=True, methods=['patch'], url_path='update-percentage')
+    def update_percentage(self, request, pk=None):  # type: ignore[no-untyped-def]
+        """Update the rollout percentage for a segment."""
+        feature_segment = self.get_object()
+
+        new_percentage = request.data.get('rollout_percentage')
+        if new_percentage is None:
+            return Response(
+                {'error': 'rollout_percentage is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            new_percentage = int(new_percentage)
+            if not 0 <= new_percentage <= 100:
+                raise ValueError()
+        except ValueError:
+            return Response(
+                {'error': 'rollout_percentage must be between 0 and 100'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        feature_segment.rollout_percentage = new_percentage
+        feature_segment.save()
+
+        serializer = self.get_serializer(feature_segment)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['post'], url_path='increase')
+    def increase(self, request, pk=None):  # type: ignore[no-untyped-def]
+        """Gradually increase rollout percentage by a specified increment."""
+        feature_segment = self.get_object()
+
+        increment = request.data.get('increment', 10)
+        try:
+            increment = int(increment)
+            if increment <= 0:
+                raise ValueError()
+        except ValueError:
+            return Response(
+                {'error': 'increment must be a positive integer'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        new_percentage = min(feature_segment.rollout_percentage + increment, 100)
+        feature_segment.rollout_percentage = new_percentage
+        feature_segment.save()
+
+        serializer = self.get_serializer(feature_segment)
+        return Response(serializer.data)
