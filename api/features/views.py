@@ -69,7 +69,7 @@ from webhooks.webhooks import WebhookEventType
 
 from .constants import INTERSECTION, UNION
 from .features_service import get_overrides_data
-from .models import Feature, FeatureSegment, FeatureState
+from .models import Feature, FeatureDependency, FeatureSegment, FeatureState
 from .multivariate.serializers import (
     FeatureMVOptionsValuesResponseSerializer,
 )
@@ -83,6 +83,7 @@ from .permissions import (
 from .serializers import (  # type: ignore[attr-defined]
     CreateFeatureSerializer,
     CustomCreateSegmentOverrideFeatureStateSerializer,
+    FeatureDependencySerializer,
     FeatureEvaluationDataSerializer,
     FeatureGroupOwnerInputSerializer,
     FeatureInfluxDataSerializer,
@@ -1120,3 +1121,83 @@ def create_segment_override(  # type: ignore[no-untyped-def]
     serializer.is_valid(raise_exception=True)
     serializer.save(environment=environment, feature=feature)  # type: ignore[no-untyped-call]
     return Response(serializer.data, status=201)
+
+
+class FeatureDependencyViewSet(viewsets.ModelViewSet):  # type: ignore[type-arg]
+    """
+    ViewSet for managing feature flag dependencies.
+
+    Endpoints:
+    - POST /api/v1/dependencies/ - Add a dependency
+    - GET /api/v1/dependencies/ - List all dependencies
+    - GET /api/v1/dependencies/{id}/ - Get specific dependency
+    - DELETE /api/v1/dependencies/{id}/ - Remove dependency
+    - GET /api/v1/dependencies/graph/ - Get dependency graph
+    """
+    serializer_class = FeatureDependencySerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):  # type: ignore[no-untyped-def]
+        queryset = FeatureDependency.objects.all().select_related(
+            'feature', 'required_feature', 'environment'
+        )
+
+        # Filter by feature if provided
+        feature_id = self.request.query_params.get('feature_id')
+        if feature_id:
+            queryset = queryset.filter(feature_id=feature_id)
+
+        # Filter by required_feature if provided
+        required_feature_id = self.request.query_params.get('required_feature_id')
+        if required_feature_id:
+            queryset = queryset.filter(required_feature_id=required_feature_id)
+
+        # Filter by environment if provided
+        environment_id = self.request.query_params.get('environment_id')
+        if environment_id:
+            queryset = queryset.filter(environment_id=environment_id)
+
+        # Filter by dependency type
+        dependency_type = self.request.query_params.get('dependency_type')
+        if dependency_type:
+            queryset = queryset.filter(dependency_type=dependency_type)
+
+        return queryset
+
+    @action(detail=False, methods=['get'], url_path='graph')
+    def graph(self, request):  # type: ignore[no-untyped-def]
+        """Get dependency graph showing all related flags."""
+        feature_id = request.query_params.get('feature_id')
+        if not feature_id:
+            return Response(
+                {'error': 'feature_id parameter is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Get all dependencies for this feature
+        dependencies = self.get_queryset().filter(feature_id=feature_id)
+        required_by = FeatureDependency.objects.filter(required_feature_id=feature_id)
+
+        graph_data = {
+            'feature_id': int(feature_id),
+            'depends_on': [
+                {
+                    'id': dep.id,
+                    'required_feature_id': dep.required_feature_id,
+                    'required_feature_name': dep.required_feature.name,
+                    'dependency_type': dep.dependency_type
+                }
+                for dep in dependencies
+            ],
+            'required_by': [
+                {
+                    'id': dep.id,
+                    'feature_id': dep.feature_id,
+                    'feature_name': dep.feature.name,
+                    'dependency_type': dep.dependency_type
+                }
+                for dep in required_by
+            ]
+        }
+
+        return Response(graph_data)
