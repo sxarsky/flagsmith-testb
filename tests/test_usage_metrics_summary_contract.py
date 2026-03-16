@@ -27,7 +27,7 @@ def test_summary_get():
     # Definition of authentication header
     headers = {}
     if os.getenv("SKYRAMP_TEST_TOKEN") is not None:
-        headers["Authorization"] = "Bearer " + os.getenv("SKYRAMP_TEST_TOKEN")
+        headers["Authorization"] = "Token " + os.getenv("SKYRAMP_TEST_TOKEN")
 
     # Execute Request
     summary_GET_response = client.send_request(
