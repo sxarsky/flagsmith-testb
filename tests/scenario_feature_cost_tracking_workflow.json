@@ -1,0 +1,210 @@
+[
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"email\": \"costtest@example.com\", \"password\": \"TestPass123!\", \"first_name\": \"Cost\", \"last_name\": \"Tester\"}",
+    "ResponseBody": "{\"id\": 1, \"email\": \"costtest@example.com\", \"first_name\": \"Cost\", \"last_name\": \"Tester\"}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Bearer SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "POST",
+    "Path": "/api/v1/auth/users/",
+    "QueryParams": {},
+    "StatusCode": 201,
+    "Port": 8080,
+    "Timestamp": "2026-03-16T21:27:55.063Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"email\": \"costtest@example.com\", \"password\": \"TestPass123!\"}",
+    "ResponseBody": "{\"token\": \"abc123token\", \"key\": \"abc123token\"}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Bearer SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "POST",
+    "Path": "/api/v1/auth/login/",
+    "QueryParams": {},
+    "StatusCode": 200,
+    "Port": 8080,
+    "Timestamp": "2026-03-16T21:27:59.018Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"name\": \"Cost Tracking Org\"}",
+    "ResponseBody": "{\"id\": 1, \"name\": \"Cost Tracking Org\", \"plan\": \"free\"}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Bearer SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "POST",
+    "Path": "/api/v1/organisations/",
+    "QueryParams": {},
+    "StatusCode": 201,
+    "Port": 8080,
+    "Timestamp": "2026-03-16T21:28:03.872Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"name\": \"Cost Tracking Project\", \"organisation\": 1}",
+    "ResponseBody": "{\"id\": 1, \"name\": \"Cost Tracking Project\", \"organisation\": 1}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Bearer SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "POST",
+    "Path": "/api/v1/projects/",
+    "QueryParams": {},
+    "StatusCode": 201,
+    "Port": 8080,
+    "Timestamp": "2026-03-16T21:28:07.897Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"name\": \"cost_tracked_feature\", \"project\": 1, \"type\": \"FLAG\", \"default_enabled\": true}",
+    "ResponseBody": "{\"id\": 1, \"name\": \"cost_tracked_feature\", \"project\": 1, \"type\": \"FLAG\", \"default_enabled\": true}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Bearer SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "POST",
+    "Path": "/api/v1/projects/1/features/",
+    "QueryParams": {},
+    "StatusCode": 201,
+    "Port": 8080,
+    "Timestamp": "2026-03-16T21:28:13.430Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"cost_per_evaluation\": \"0.000100\", \"fixed_monthly_cost\": \"25.00\", \"cost_category\": \"compute\", \"currency\": \"USD\"}",
+    "ResponseBody": "{\"id\": 1, \"feature\": 1, \"cost_per_evaluation\": \"0.000100\", \"fixed_monthly_cost\": \"25.00\", \"cost_category\": \"compute\", \"currency\": \"USD\"}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Bearer SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "POST",
+    "Path": "/api/v1/projects/1/features/1/cost-profile/set-cost/",
+    "QueryParams": {},
+    "StatusCode": 200,
+    "Port": 8080,
+    "Timestamp": "2026-03-16T21:28:19.062Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "",
+    "ResponseBody": "{\"feature_id\": 1, \"projected_evaluations\": 10000, \"variable_cost\": 1.0, \"fixed_cost\": 25.0, \"total_cost\": 26.0, \"currency\": \"USD\", \"cost_category\": \"compute\"}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Bearer SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "GET",
+    "Path": "/api/v1/projects/1/features/1/cost-profile/estimate/",
+    "QueryParams": {},
+    "StatusCode": 200,
+    "Port": 8080,
+    "Timestamp": "2026-03-16T21:28:26.180Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "",
+    "ResponseBody": "{\"project_id\": 1, \"project_name\": \"Cost Tracking Project\", \"total_fixed_monthly_cost\": 25.0, \"total_cost_per_evaluation\": 0.0001, \"features_count\": 1, \"features\": [{\"feature_id\": 1, \"feature_name\": \"cost_tracked_feature\", \"cost_per_evaluation\": 0.0001, \"fixed_monthly_cost\": 25.0, \"cost_category\": \"compute\", \"currency\": \"USD\"}]}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Bearer SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "GET",
+    "Path": "/api/v1/projects/1/cost-aggregation/",
+    "QueryParams": {},
+    "StatusCode": 200,
+    "Port": 8080,
+    "Timestamp": "2026-03-16T21:28:34.274Z",
+    "Scheme": "http"
+  }
+]
