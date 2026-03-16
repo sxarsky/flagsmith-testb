@@ -322,3 +322,39 @@ class Identity(models.Model):
                 )
             }.values()
         ]
+
+
+class IdentityTraitHistory(models.Model):
+    """
+    Tracks historical changes to identity trait values.
+    Support and data teams can see what traits a user had at any point in time.
+    """
+    identity = models.ForeignKey(
+        Identity,
+        on_delete=models.CASCADE,
+        related_name='trait_history'
+    )
+    trait_key = models.CharField(max_length=200)
+    old_value = models.TextField(null=True, blank=True)
+    new_value = models.TextField()
+    changed_at = models.DateTimeField(auto_now_add=True)
+    changed_by = models.CharField(
+        max_length=50,
+        choices=[
+            ('system', 'System'),
+            ('api', 'API'),
+            ('user', 'User')
+        ],
+        default='api'
+    )
+
+    class Meta:
+        db_table = 'identity_trait_history'
+        ordering = ['-changed_at']
+        indexes = [
+            models.Index(fields=['identity', 'trait_key', '-changed_at']),
+            models.Index(fields=['identity', '-changed_at']),
+        ]
+
+    def __str__(self):
+        return f"{self.identity.identifier} - {self.trait_key} changed at {self.changed_at}"
