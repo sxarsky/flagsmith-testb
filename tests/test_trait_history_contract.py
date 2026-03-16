@@ -48,6 +48,7 @@ def test_trait_history_get():
         assert "identity" in item
         assert "identity_identifier" in item
         assert "trait_key" in item
+        assert "old_value" in item
         assert "new_value" in item
         assert "changed_at" in item
         assert "changed_by" in item
