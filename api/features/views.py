@@ -69,7 +69,7 @@ from webhooks.webhooks import WebhookEventType
 
 from .constants import INTERSECTION, UNION
 from .features_service import get_overrides_data
-from .models import Feature, FeatureSegment, FeatureState
+from .models import Feature, FeatureHealthStatus, FeatureSegment, FeatureState
 from .multivariate.serializers import (
     FeatureMVOptionsValuesResponseSerializer,
 )
@@ -85,6 +85,7 @@ from .serializers import (  # type: ignore[attr-defined]
     CustomCreateSegmentOverrideFeatureStateSerializer,
     FeatureEvaluationDataSerializer,
     FeatureGroupOwnerInputSerializer,
+    FeatureHealthStatusSerializer,
     FeatureInfluxDataSerializer,
     FeatureOwnerInputSerializer,
     FeatureQuerySerializer,
@@ -1120,3 +1121,64 @@ def create_segment_override(  # type: ignore[no-untyped-def]
     serializer.is_valid(raise_exception=True)
     serializer.save(environment=environment, feature=feature)  # type: ignore[no-untyped-call]
     return Response(serializer.data, status=201)
+
+
+class FeatureHealthStatusViewSet(viewsets.ModelViewSet):  # type: ignore[type-arg]
+    """
+    ViewSet for managing feature flag health status.
+
+    Endpoints:
+    - GET /api/v1/health-status/ - List all health statuses
+    - GET /api/v1/health-status/{id}/ - Get specific health status
+    - POST /api/v1/health-status/ - Create/update health status
+    - GET /api/v1/health-status/unhealthy/ - List unhealthy flags
+    - GET /api/v1/health-status/zombies/ - List zombie flags
+    """
+    serializer_class = FeatureHealthStatusSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):  # type: ignore[no-untyped-def]
+        queryset = FeatureHealthStatus.objects.all().select_related('feature', 'environment')
+
+        # Filter by feature if provided
+        feature_id = self.request.query_params.get('feature_id')
+        if feature_id:
+            queryset = queryset.filter(feature_id=feature_id)
+
+        # Filter by environment if provided
+        environment_id = self.request.query_params.get('environment_id')
+        if environment_id:
+            queryset = queryset.filter(environment_id=environment_id)
+
+        # Filter by minimum health score
+        min_health_score = self.request.query_params.get('min_health_score')
+        if min_health_score:
+            queryset = queryset.filter(health_score__gte=int(min_health_score))
+
+        # Filter by maximum health score
+        max_health_score = self.request.query_params.get('max_health_score')
+        if max_health_score:
+            queryset = queryset.filter(health_score__lte=int(max_health_score))
+
+        return queryset
+
+    @action(detail=False, methods=['get'], url_path='unhealthy')
+    def unhealthy(self, request):  # type: ignore[no-untyped-def]
+        """Get all flags with health score below 70."""
+        queryset = self.get_queryset().filter(health_score__lt=70)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'], url_path='zombies')
+    def zombies(self, request):  # type: ignore[no-untyped-def]
+        """Get all zombie flags (not evaluated in 30+ days)."""
+        queryset = self.get_queryset().filter(is_zombie=True)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'], url_path='alerts')
+    def alerts(self, request):  # type: ignore[no-untyped-def]
+        """Get all flags with active alerts."""
+        queryset = self.get_queryset().filter(alert_triggered=True)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
