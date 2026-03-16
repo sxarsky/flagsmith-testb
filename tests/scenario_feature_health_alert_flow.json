@@ -1,0 +1,158 @@
+[
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"name\": \"Health Monitor Org\"}",
+    "ResponseBody": "{\"id\": 1, \"name\": \"Health Monitor Org\", \"plan\": \"free\", \"num_seats\": 1, \"created_date\": \"2026-03-16T00:00:00Z\"}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Token SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "POST",
+    "Path": "/api/v1/organisations/",
+    "QueryParams": {},
+    "StatusCode": 201,
+    "Port": 8080,
+    "Timestamp": "2026-03-16T21:16:16.690Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"name\": \"Health Monitor Project\", \"organisation\": 1}",
+    "ResponseBody": "{\"id\": 1, \"name\": \"Health Monitor Project\", \"organisation\": 1, \"hide_disabled_flags\": false, \"enable_dynamo_db\": false}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Token SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "POST",
+    "Path": "/api/v1/projects/",
+    "QueryParams": {},
+    "StatusCode": 201,
+    "Port": 8080,
+    "Timestamp": "2026-03-16T21:16:20.808Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"name\": \"Development\", \"project\": 1}",
+    "ResponseBody": "{\"id\": 1, \"name\": \"Development\", \"api_key\": \"env-key-test\", \"project\": 1, \"allow_client_traits\": true}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Token SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "POST",
+    "Path": "/api/v1/environments/",
+    "QueryParams": {},
+    "StatusCode": 201,
+    "Port": 8080,
+    "Timestamp": "2026-03-16T21:16:25.301Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"name\": \"health_monitored_flag\", \"type\": \"FLAG\", \"project\": 1, \"description\": \"Feature flag for health monitoring test\"}",
+    "ResponseBody": "{\"id\": 1, \"name\": \"health_monitored_flag\", \"project\": 1, \"description\": \"Feature flag for health monitoring test\", \"initial_value\": null, \"type\": \"STANDARD\", \"is_archived\": false}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Token SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "POST",
+    "Path": "/api/v1/projects/1/features/",
+    "QueryParams": {},
+    "StatusCode": 201,
+    "Port": 8080,
+    "Timestamp": "2026-03-16T21:16:30.856Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"environment_id\": 1, \"alert_enabled\": true}",
+    "ResponseBody": "{\"id\": 1, \"feature\": 1, \"environment\": 1, \"health_score\": 100, \"last_evaluated\": null, \"evaluation_error_rate\": 0.0, \"days_since_last_change\": 0, \"is_zombie\": true, \"alert_triggered\": true, \"last_checked\": \"2026-03-16T00:00:00Z\"}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Token SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "POST",
+    "Path": "/api/v1/features/health-status/configure-alerts/",
+    "QueryParams": {},
+    "StatusCode": 200,
+    "Port": 8080,
+    "Timestamp": "2026-03-16T21:16:37.364Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "",
+    "ResponseBody": "[{\"id\": 1, \"feature\": 1, \"environment\": 1, \"health_score\": 100, \"last_evaluated\": null, \"evaluation_error_rate\": 0.0, \"days_since_last_change\": 0, \"is_zombie\": true, \"alert_triggered\": true, \"last_checked\": \"2026-03-16T00:00:00Z\"}]",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Token SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "GET",
+    "Path": "/api/v1/features/health-status/active-alerts/",
+    "QueryParams": {},
+    "StatusCode": 200,
+    "Port": 8080,
+    "Timestamp": "2026-03-16T21:16:41.818Z",
+    "Scheme": "http"
+  }
+]
