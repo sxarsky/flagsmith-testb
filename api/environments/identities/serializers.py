@@ -133,3 +133,24 @@ class IdentitySourceIdentityRequestSerializer(serializers.Serializer):  # type: 
         required=True,
         help_text="ID of the source identity to clone feature states from.",
     )
+
+
+class IdentityTraitHistorySerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
+    """
+    Serializer for identity trait history records.
+    """
+    identity_identifier = serializers.CharField(source='identity.identifier', read_only=True)
+
+    class Meta:
+        model = 'identities.IdentityTraitHistory'  # String reference to avoid import timing issues
+        fields = [
+            'id',
+            'identity',
+            'identity_identifier',
+            'trait_key',
+            'old_value',
+            'new_value',
+            'changed_at',
+            'changed_by'
+        ]
+        read_only_fields = ['id', 'changed_at']

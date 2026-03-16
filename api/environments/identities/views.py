@@ -22,9 +22,10 @@ from app.pagination import CustomPagination
 from core.constants import FLAGSMITH_UPDATED_AT_HEADER, SDK_ENVIRONMENT_KEY_HEADER
 from core.request_origin import RequestOrigin
 from edge_api.identities.tasks import forward_identity_request
-from environments.identities.models import Identity
+from environments.identities.models import Identity, IdentityTraitHistory
 from environments.identities.serializers import (
     IdentitySerializer,
+    IdentityTraitHistorySerializer,
     SDKIdentitiesQuerySerializer,
 )
 from environments.models import Environment
@@ -330,3 +331,44 @@ class SDKIdentities(SDKAPIView):
         return Response(
             data=serializer.data, status=status.HTTP_200_OK, headers=headers
         )
+
+
+class IdentityTraitHistoryViewSet(viewsets.ReadOnlyModelViewSet):  # type: ignore[type-arg]
+    """
+    ViewSet for viewing identity trait history.
+
+    Endpoints:
+    - GET /api/v1/trait-history/ - List all trait history records
+    - GET /api/v1/trait-history/{id}/ - Get specific history record
+    """
+    serializer_class = IdentityTraitHistorySerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = CustomPagination
+
+    def get_queryset(self):  # type: ignore[no-untyped-def]
+        queryset = IdentityTraitHistory.objects.all().select_related('identity')
+
+        # Filter by identity if provided
+        identity_id = self.request.query_params.get('identity_id')
+        if identity_id:
+            queryset = queryset.filter(identity_id=identity_id)
+
+        # Filter by trait_key if provided
+        trait_key = self.request.query_params.get('trait_key')
+        if trait_key:
+            queryset = queryset.filter(trait_key=trait_key)
+
+        # Filter by environment if provided
+        environment_id = self.request.query_params.get('environment_id')
+        if environment_id:
+            queryset = queryset.filter(identity__environment_id=environment_id)
+
+        # Filter by date range if provided
+        from_date = self.request.query_params.get('from_date')
+        to_date = self.request.query_params.get('to_date')
+        if from_date:
+            queryset = queryset.filter(changed_at__gte=from_date)
+        if to_date:
+            queryset = queryset.filter(changed_at__lte=to_date)
+
+        return queryset.order_by('-changed_at')

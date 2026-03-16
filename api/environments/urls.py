@@ -28,7 +28,7 @@ from integrations.slack.views import (
 from integrations.webhook.views import WebhookConfigurationViewSet
 
 from .identities.traits.views import TraitViewSet
-from .identities.views import IdentityViewSet
+from .identities.views import IdentityTraitHistoryViewSet, IdentityViewSet
 from .permissions.views import (
     UserEnvironmentPermissionsViewSet,
     UserPermissionGroupEnvironmentPermissionsViewSet,
@@ -46,6 +46,9 @@ router.register(r"", EnvironmentViewSet, basename="environment")
 environments_router = routers.NestedSimpleRouter(router, r"", lookup="environment")
 environments_router.register(
     r"identities", IdentityViewSet, basename="environment-identities"
+)
+environments_router.register(
+    r"trait-history", IdentityTraitHistoryViewSet, basename="trait-history"
 )
 environments_router.register(
     r"edge-identities", EdgeIdentityViewSet, basename="environment-edge-identities"
