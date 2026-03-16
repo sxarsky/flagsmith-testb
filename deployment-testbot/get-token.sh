@@ -2,7 +2,7 @@
 # TestBot Auth Token Script for Flagsmith
 # Logs in and outputs API token
 
-API_BASE="http://localhost:8080/api/v1"
+API_BASE="http://localhost:8000/api/v1"
 
 TOKEN=$(curl -s -X POST "$API_BASE/auth/login/" \
   -H "Content-Type: application/json" \
