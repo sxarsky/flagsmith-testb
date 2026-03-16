@@ -69,7 +69,7 @@ from webhooks.webhooks import WebhookEventType
 
 from .constants import INTERSECTION, UNION
 from .features_service import get_overrides_data
-from .models import Feature, FeatureSegment, FeatureState
+from .models import Feature, FeatureCostProfile, FeatureSegment, FeatureState
 from .multivariate.serializers import (
     FeatureMVOptionsValuesResponseSerializer,
 )
@@ -83,6 +83,7 @@ from .permissions import (
 from .serializers import (  # type: ignore[attr-defined]
     CreateFeatureSerializer,
     CustomCreateSegmentOverrideFeatureStateSerializer,
+    FeatureCostProfileSerializer,
     FeatureEvaluationDataSerializer,
     FeatureGroupOwnerInputSerializer,
     FeatureInfluxDataSerializer,
@@ -1120,3 +1121,67 @@ def create_segment_override(  # type: ignore[no-untyped-def]
     serializer.is_valid(raise_exception=True)
     serializer.save(environment=environment, feature=feature)  # type: ignore[no-untyped-call]
     return Response(serializer.data, status=201)
+
+
+class FeatureCostProfileViewSet(viewsets.ModelViewSet):  # type: ignore[type-arg]
+    """
+    ViewSet for managing feature flag cost profiles.
+
+    Endpoints:
+    - POST /api/v1/cost-profiles/ - Create cost profile
+    - GET /api/v1/cost-profiles/ - List all cost profiles
+    - GET /api/v1/cost-profiles/{id}/ - Get profile details
+    - PUT /api/v1/cost-profiles/{id}/ - Update profile
+    - DELETE /api/v1/cost-profiles/{id}/ - Delete profile
+    """
+    serializer_class = FeatureCostProfileSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):  # type: ignore[no-untyped-def]
+        queryset = FeatureCostProfile.objects.all().select_related('feature')
+
+        # Filter by feature if provided
+        feature_id = self.request.query_params.get('feature_id')
+        if feature_id:
+            queryset = queryset.filter(feature_id=feature_id)
+
+        # Filter by cost category if provided
+        cost_category = self.request.query_params.get('cost_category')
+        if cost_category:
+            queryset = queryset.filter(cost_category=cost_category)
+
+        # Filter by currency if provided
+        currency = self.request.query_params.get('currency')
+        if currency:
+            queryset = queryset.filter(currency=currency)
+
+        return queryset
+
+    @action(detail=False, methods=['get'], url_path='summary')
+    def summary(self, request):  # type: ignore[no-untyped-def]
+        """Get cost summary across all features."""
+        from django.db.models import Sum
+
+        queryset = self.get_queryset()
+
+        # Calculate totals by category
+        summary_data = {
+            'total_fixed_monthly': queryset.aggregate(
+                total=Sum('fixed_monthly_cost')
+            )['total'] or 0,
+            'by_category': {}
+        }
+
+        # Group by category
+        for category in ['compute', 'storage', 'api_calls', 'network', 'other']:
+            category_data = queryset.filter(cost_category=category).aggregate(
+                total_fixed=Sum('fixed_monthly_cost'),
+                count=models.Count('id')
+            )
+            if category_data['count'] > 0:
+                summary_data['by_category'][category] = {
+                    'total_fixed_monthly': category_data['total_fixed'] or 0,
+                    'feature_count': category_data['count']
+                }
+
+        return Response(summary_data)
