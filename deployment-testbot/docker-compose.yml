@@ -2,7 +2,10 @@ version: '3.8'
 
 services:
   flagsmith:
-    image: flagsmith/flagsmith:latest
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: oss-unified
     container_name: testbot-flagsmith
     ports:
       - "8080:8000"
