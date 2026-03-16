@@ -26,7 +26,7 @@ def test_segment_rollouts_get():
     # Definition of authentication header
     headers = {}
     if os.getenv("SKYRAMP_TEST_TOKEN") is not None:
-        headers["Authorization"] = "Bearer " + os.getenv("SKYRAMP_TEST_TOKEN")
+        headers["Authorization"] = "Token " + os.getenv("SKYRAMP_TEST_TOKEN")
 
     # Execute Request
     segment-rollouts_GET_response = client.send_request(

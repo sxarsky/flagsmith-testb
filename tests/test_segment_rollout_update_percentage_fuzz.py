@@ -28,7 +28,7 @@ def test_update_percentage_patch():
     # Definition of authentication header
     headers = {}
     if os.getenv("SKYRAMP_TEST_TOKEN") is not None:
-        headers["Authorization"] = "Bearer " + os.getenv("SKYRAMP_TEST_TOKEN")
+        headers["Authorization"] = "Token " + os.getenv("SKYRAMP_TEST_TOKEN")
 
     # Request Body
     update-percentage_PATCH_request_body = r'''{
