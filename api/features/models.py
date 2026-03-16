@@ -1170,3 +1170,42 @@ class FeatureStateValue(
 
     def _get_environment(self) -> typing.Optional["Environment"]:
         return self.feature_state.environment
+
+
+class FeatureDependency(models.Model):
+    """
+    Represents dependencies between feature flags.
+    Prevents misconfiguration where a feature is enabled without its prerequisites.
+    """
+    feature = models.ForeignKey(
+        Feature,
+        on_delete=models.CASCADE,
+        related_name='depends_on'
+    )
+    required_feature = models.ForeignKey(
+        Feature,
+        on_delete=models.CASCADE,
+        related_name='required_by'
+    )
+    environment = models.ForeignKey(
+        'environments.Environment',
+        on_delete=models.CASCADE,
+        related_name='feature_dependencies'
+    )
+    dependency_type = models.CharField(
+        max_length=20,
+        choices=[
+            ('requires', 'Requires'),
+            ('conflicts_with', 'Conflicts With')
+        ],
+        default='requires',
+        help_text="Type of dependency relationship"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'feature_dependency'
+        unique_together = [['feature', 'required_feature', 'environment']]
+
+    def __str__(self):
+        return f"{self.feature.name} {self.dependency_type} {self.required_feature.name}"
