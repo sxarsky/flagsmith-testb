@@ -1,0 +1,158 @@
+[
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"name\": \"skyramp-test-org-1742137800\"}",
+    "ResponseBody": "{\"id\": 5001, \"name\": \"skyramp-test-org-1742137800\", \"plan\": \"free\", \"subscription\": {\"id\": 1, \"max_seats\": 1, \"plan\": \"free\"}}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Bearer SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "POST",
+    "Path": "/api/v1/organisations/",
+    "QueryParams": {},
+    "StatusCode": 201,
+    "Port": 8000,
+    "Timestamp": "2026-03-16T21:14:53.809Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"name\": \"skyramp-test-project-1742137800\", \"organisation\": 5001}",
+    "ResponseBody": "{\"id\": 6001, \"name\": \"skyramp-test-project-1742137800\", \"organisation\": 5001, \"hide_disabled_flags\": false, \"enable_realtime_updates\": false}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Bearer SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "POST",
+    "Path": "/api/v1/projects/",
+    "QueryParams": {},
+    "StatusCode": 201,
+    "Port": 8000,
+    "Timestamp": "2026-03-16T21:14:58.470Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"name\": \"skyramp-test-env-1742137800\", \"project\": 6001}",
+    "ResponseBody": "{\"id\": 8001, \"name\": \"skyramp-test-env-1742137800\", \"project\": 6001, \"api_key\": \"ser.skyramptest1742137800\", \"allow_client_traits\": true, \"description\": \"\"}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Bearer SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "POST",
+    "Path": "/api/v1/environments/",
+    "QueryParams": {},
+    "StatusCode": 201,
+    "Port": 8000,
+    "Timestamp": "2026-03-16T21:15:04.378Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"identifier\": \"skyramp-identity-1742137800\"}",
+    "ResponseBody": "{\"id\": 7001, \"identifier\": \"skyramp-identity-1742137800\", \"environment\": 8001, \"created_date\": \"2026-03-16T21:15:00Z\"}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Bearer SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "POST",
+    "Path": "/api/v1/environments/ser.skyramptest1742137800/identities/",
+    "QueryParams": {},
+    "StatusCode": 201,
+    "Port": 8000,
+    "Timestamp": "2026-03-16T21:15:09.983Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"trait_key\": \"plan\", \"trait_value\": \"premium\"}",
+    "ResponseBody": "{\"id\": 9001, \"identity\": {\"id\": 7001, \"identifier\": \"skyramp-identity-1742137800\"}, \"trait_key\": \"plan\", \"trait_value\": \"premium\"}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Bearer SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "POST",
+    "Path": "/api/v1/environments/ser.skyramptest1742137800/identities/7001/traits/",
+    "QueryParams": {},
+    "StatusCode": 200,
+    "Port": 8000,
+    "Timestamp": "2026-03-16T21:15:15.425Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "",
+    "ResponseBody": "{\"count\": 1, \"next\": null, \"previous\": null, \"results\": [{\"id\": 10001, \"identity\": 7001, \"trait_key\": \"plan\", \"old_value\": null, \"new_value\": \"premium\", \"changed_at\": \"2026-03-16T21:15:00Z\", \"changed_by\": \"api\"}]}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Bearer SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "GET",
+    "Path": "/api/v1/environments/ser.skyramptest1742137800/identities/7001/trait-history/",
+    "QueryParams": {},
+    "StatusCode": 200,
+    "Port": 8000,
+    "Timestamp": "2026-03-16T21:15:20.530Z",
+    "Scheme": "http"
+  }
+]
