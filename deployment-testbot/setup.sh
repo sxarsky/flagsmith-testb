@@ -15,7 +15,7 @@ docker compose up -d
 
 echo "Waiting for service to be ready (including migrations)..."
 for i in {1..60}; do
-  if curl -sf http://localhost:8080/health > /dev/null 2>&1; then
+  if curl -sf http://localhost:8000/health > /dev/null 2>&1; then
     echo "Service ready after $i attempts ($(($i * 2)) seconds)"
     break
   fi
@@ -42,7 +42,7 @@ except: pass
 EOF
 
 echo "Logging in to get API key..."
-API_BASE="http://localhost:8080/api/v1"
+API_BASE="http://localhost:8000/api/v1"
 API_KEY=$(curl -s -X POST "$API_BASE/auth/login/" \
   -H "Content-Type: application/json" \
   -d '{"email":"admin@example.com","password":"TestPass123!"}' \
