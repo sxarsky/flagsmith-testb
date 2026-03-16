@@ -730,3 +730,36 @@ class CustomCreateSegmentOverrideFeatureStateSerializer(
                 {"environment": SEGMENT_OVERRIDE_LIMIT_EXCEEDED_MESSAGE}
             )
         return super().create(validated_data)  # type: ignore[no-any-return,no-untyped-call]
+
+
+class FeatureDependencySerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
+    """
+    Serializer for feature flag dependencies.
+    """
+    feature_name = serializers.CharField(source='feature.name', read_only=True)
+    required_feature_name = serializers.CharField(source='required_feature.name', read_only=True)
+    environment_name = serializers.CharField(source='environment.name', read_only=True)
+
+    class Meta:
+        model = 'features.FeatureDependency'  # String reference to avoid import timing issues
+        fields = [
+            'id',
+            'feature',
+            'feature_name',
+            'required_feature',
+            'required_feature_name',
+            'environment',
+            'environment_name',
+            'dependency_type',
+            'created_at'
+        ]
+        read_only_fields = ['id', 'created_at']
+
+    def validate(self, data):  # type: ignore[no-untyped-def]
+        """Ensure no self-dependencies and no circular dependencies."""
+        if 'feature' in data and 'required_feature' in data:
+            if data['feature'] == data['required_feature']:
+                raise serializers.ValidationError(
+                    "A feature cannot depend on itself"
+                )
+        return data
