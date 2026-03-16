@@ -1170,3 +1170,58 @@ class FeatureStateValue(
 
     def _get_environment(self) -> typing.Optional["Environment"]:
         return self.feature_state.environment
+
+
+class FeatureChangeRequest(models.Model):
+    """
+    Represents a request to change a feature flag in an environment that requires approval.
+    Enterprise teams can use this for approval workflows before production changes.
+    """
+    feature = models.ForeignKey(
+        Feature,
+        on_delete=models.CASCADE,
+        related_name='change_requests'
+    )
+    environment = models.ForeignKey(
+        'environments.Environment',
+        on_delete=models.CASCADE,
+        related_name='feature_change_requests'
+    )
+    requested_by = models.ForeignKey(
+        'users.FFAdminUser',
+        on_delete=models.CASCADE,
+        related_name='requested_changes'
+    )
+    requested_change = models.JSONField(
+        help_text="JSON representation of the requested change"
+    )
+    justification = models.TextField(
+        help_text="Business justification for the change"
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ('pending', 'Pending'),
+            ('approved', 'Approved'),
+            ('rejected', 'Rejected')
+        ],
+        default='pending'
+    )
+    reviewed_by = models.ForeignKey(
+        'users.FFAdminUser',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='reviewed_changes'
+    )
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    review_comment = models.TextField(blank=True, default='')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'feature_change_request'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Change Request for {self.feature.name} in {self.environment.name} - {self.status}"
