@@ -46,7 +46,7 @@ from .feature_segments.limits import (
 from .feature_segments.serializers import (
     CustomCreateSegmentOverrideFeatureSegmentSerializer,
 )
-from .models import Feature, FeatureState
+from .models import Feature, FeatureState, FeatureCostProfile
 from .multivariate.serializers import NestedMultivariateFeatureOptionSerializer
 
 
@@ -730,3 +730,9 @@ class CustomCreateSegmentOverrideFeatureStateSerializer(
                 {"environment": SEGMENT_OVERRIDE_LIMIT_EXCEEDED_MESSAGE}
             )
         return super().create(validated_data)  # type: ignore[no-any-return,no-untyped-call]
+
+
+class FeatureCostProfileSerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
+    class Meta:
+        model = FeatureCostProfile
+        fields = '__all__'

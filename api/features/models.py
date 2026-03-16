@@ -1170,3 +1170,14 @@ class FeatureStateValue(
 
     def _get_environment(self) -> typing.Optional["Environment"]:
         return self.feature_state.environment
+
+
+class FeatureCostProfile(models.Model):
+    feature = models.ForeignKey(Feature, on_delete=models.CASCADE, related_name='cost_profile')
+    cost_per_evaluation = models.DecimalField(max_digits=10, decimal_places=6, default=0)
+    fixed_monthly_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    cost_category = models.CharField(max_length=50, default='compute')  # compute, storage, api_calls
+    currency = models.CharField(max_length=3, default='USD')
+
+    class Meta:
+        db_table = 'feature_cost_profile'
