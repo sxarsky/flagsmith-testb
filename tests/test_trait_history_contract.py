@@ -39,6 +39,18 @@ def test_trait_history_get():
 
     # Generated Assertions
     assert skyramp.check_status_code(trait-history_GET_response, "20x")
+    response_body = skyramp.get_response_body(trait-history_GET_response)
+    assert "count" in response_body
+    assert "results" in response_body
+    if len(response_body["results"]) > 0:
+        item = response_body["results"][0]
+        assert "id" in item
+        assert "identity" in item
+        assert "identity_identifier" in item
+        assert "trait_key" in item
+        assert "new_value" in item
+        assert "changed_at" in item
+        assert "changed_by" in item
 
 
 if __name__ == "__main__":
