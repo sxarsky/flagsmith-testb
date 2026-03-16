@@ -39,7 +39,7 @@ jobs:
           skyramp_executor_version: v1.3.13
 
           target_setup_command: './deployment-testbot/setup.sh'
-          target_ready_check_command: 'curl -f http://localhost:8080/health'
+          target_ready_check_command: 'curl -f http://localhost:8000/health'
           target_ready_check_timeout: 120
           auth_token_command: './deployment-testbot/get-token.sh'
 
