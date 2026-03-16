@@ -25,7 +25,7 @@ def test_integration():
     # Definition of authentication header
     headers = {}
     if os.getenv("SKYRAMP_TEST_TOKEN") is not None:
-        headers["Authorization"] = "Bearer " + os.getenv("SKYRAMP_TEST_TOKEN")
+        headers["Authorization"] = "Token " + os.getenv("SKYRAMP_TEST_TOKEN")
 
     # Request Body
     endpoint_1_POST_request_body = r'''{
