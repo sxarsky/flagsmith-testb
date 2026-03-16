@@ -1,0 +1,106 @@
+[
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"feature\": 2, \"environment\": 1, \"health_score\": 20, \"last_evaluated\": \"2026-01-01T00:00:00Z\", \"evaluation_error_rate\": 0.0, \"days_since_last_change\": 90, \"is_zombie\": true, \"alert_triggered\": true}",
+    "ResponseBody": "{\"id\": 2, \"feature\": 2, \"feature_name\": \"old-experiment-flag\", \"environment\": 1, \"environment_name\": \"production\", \"health_score\": 20, \"last_evaluated\": \"2026-01-01T00:00:00Z\", \"evaluation_error_rate\": 0.0, \"days_since_last_change\": 90, \"is_zombie\": true, \"alert_triggered\": true, \"last_check_at\": \"2026-03-16T10:00:00Z\", \"created_at\": \"2026-03-16T10:00:00Z\"}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Bearer SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "POST",
+    "Path": "/api/v1/features/health-status/",
+    "QueryParams": {},
+    "StatusCode": 201,
+    "Port": 8000,
+    "Timestamp": "2026-03-16T22:00:52.182Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "",
+    "ResponseBody": "[{\"id\": 2, \"feature\": 2, \"feature_name\": \"old-experiment-flag\", \"environment\": 1, \"environment_name\": \"production\", \"health_score\": 20, \"last_evaluated\": \"2026-01-01T00:00:00Z\", \"evaluation_error_rate\": 0.0, \"days_since_last_change\": 90, \"is_zombie\": true, \"alert_triggered\": true, \"last_check_at\": \"2026-03-16T10:00:00Z\", \"created_at\": \"2026-03-16T10:00:00Z\"}]",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Bearer SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "GET",
+    "Path": "/api/v1/features/health-status/zombies/",
+    "QueryParams": {},
+    "StatusCode": 200,
+    "Port": 8000,
+    "Timestamp": "2026-03-16T22:00:57.336Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "",
+    "ResponseBody": "[{\"id\": 2, \"feature\": 2, \"feature_name\": \"old-experiment-flag\", \"environment\": 1, \"environment_name\": \"production\", \"health_score\": 20, \"last_evaluated\": \"2026-01-01T00:00:00Z\", \"evaluation_error_rate\": 0.0, \"days_since_last_change\": 90, \"is_zombie\": true, \"alert_triggered\": true, \"last_check_at\": \"2026-03-16T10:00:00Z\", \"created_at\": \"2026-03-16T10:00:00Z\"}]",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Bearer SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "GET",
+    "Path": "/api/v1/features/health-status/alerts/",
+    "QueryParams": {},
+    "StatusCode": 200,
+    "Port": 8000,
+    "Timestamp": "2026-03-16T22:01:01.984Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "",
+    "ResponseBody": "{}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Bearer SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "DELETE",
+    "Path": "/api/v1/features/health-status/2/",
+    "QueryParams": {},
+    "StatusCode": 204,
+    "Port": 8000,
+    "Timestamp": "2026-03-16T22:01:05.987Z",
+    "Scheme": "http"
+  }
+]
