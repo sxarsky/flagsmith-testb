@@ -17,7 +17,7 @@ from features.import_export.views import (
     FeatureImportListView,
 )
 from features.multivariate.views import MultivariateFeatureOptionViewSet
-from features.views import FeatureViewSet
+from features.views import FeatureViewSet, FeatureCostProfileViewSet
 from integrations.datadog.views import DataDogConfigurationViewSet
 from integrations.grafana.views import GrafanaProjectConfigurationViewSet
 from integrations.launch_darkly.views import LaunchDarklyImportRequestViewSet
@@ -118,6 +118,11 @@ nested_features_router.register(
     basename="feature-external-resources",
 )
 
+nested_features_router.register(
+    r"cost-profile",
+    FeatureCostProfileViewSet,
+    basename="feature-cost-profile",
+)
 app_name = "projects"
 
 urlpatterns = [

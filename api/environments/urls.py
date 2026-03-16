@@ -10,6 +10,7 @@ from edge_api.identities.views import (
 )
 from features.views import (
     EnvironmentFeatureStateViewSet,
+    FeatureScheduleViewSet,
     IdentityFeatureStateViewSet,
     create_segment_override,
 )
@@ -173,4 +174,7 @@ urlpatterns = [
         get_experiment_results,
         name="experiment-results",
     ),
+    path("<str:environment_api_key>/features/<int:feature_pk>/schedules/", FeatureScheduleViewSet.as_view({"get": "list", "post": "create"}), name="feature-schedules-list"),
+    path("<str:environment_api_key>/features/<int:feature_pk>/schedules/<int:pk>/", FeatureScheduleViewSet.as_view({"get": "retrieve", "delete": "destroy"}), name="feature-schedules-detail"),
+    path("<str:environment_api_key>/schedules/", FeatureScheduleViewSet.as_view({"get": "by_environment"}), name="environment-schedules"),
 ]

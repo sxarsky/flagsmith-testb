@@ -160,3 +160,23 @@ def _get_previous_multivariate_values(
 @register_task_handler()
 def delete_feature(feature_id: int) -> None:
     Feature.objects.get(pk=feature_id).delete()
+
+
+@register_task_handler()
+def execute_scheduled_flag_changes() -> None:
+    from django.utils import timezone
+    from .models import FeatureSchedule
+    now = timezone.now()
+    pending_schedules = FeatureSchedule.objects.filter(status='pending', scheduled_at__lte=now).select_related('feature', 'environment')
+    for schedule in pending_schedules:
+        try:
+            feature_states = FeatureState.objects.filter(feature=schedule.feature, environment=schedule.environment, identity__isnull=True, feature_segment__isnull=True)
+            for feature_state in feature_states:
+                feature_state.enabled = schedule.new_enabled_state
+                feature_state.save()
+            schedule.status = 'executed'
+            schedule.executed_at = now
+            schedule.save()
+            logger.info(f"Executed scheduled change for feature {schedule.feature.name} in environment {schedule.environment.name}")
+        except Exception as e:
+            logger.error(f"Failed to execute schedule {schedule.id}: {str(e)}")

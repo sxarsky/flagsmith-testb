@@ -226,6 +226,46 @@ class ProjectViewSet(viewsets.ModelViewSet):  # type: ignore[type-arg]
         identity_migrator.trigger_migration()  # type: ignore[no-untyped-call]
         return Response(status=status.HTTP_202_ACCEPTED)
 
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_path="cost-aggregation",
+    )
+    def cost_aggregation(self, request: Request, pk: int = None):  # type: ignore[no-untyped-def,assignment]
+        """
+        Get cost aggregation for all features in a project.
+        """
+        from features.models import FeatureCostProfile
+
+        project = self.get_object()
+
+        cost_profiles = FeatureCostProfile.objects.filter(
+            feature__project_id=project.id
+        ).select_related("feature")
+
+        total_fixed_cost = sum(float(cp.fixed_monthly_cost) for cp in cost_profiles)
+        total_variable_cost = sum(float(cp.cost_per_evaluation) for cp in cost_profiles)
+
+        features_cost_data = []
+        for cp in cost_profiles:
+            features_cost_data.append({
+                "feature_id": cp.feature_id,
+                "feature_name": cp.feature.name,
+                "cost_per_evaluation": float(cp.cost_per_evaluation),
+                "fixed_monthly_cost": float(cp.fixed_monthly_cost),
+                "cost_category": cp.cost_category,
+                "currency": cp.currency,
+            })
+
+        return Response({
+            "project_id": project.id,
+            "project_name": project.name,
+            "total_fixed_monthly_cost": total_fixed_cost,
+            "total_cost_per_evaluation": total_variable_cost,
+            "features_count": len(features_cost_data),
+            "features": features_cost_data,
+        })
+
 
 class BaseProjectPermissionsViewSet(viewsets.ModelViewSet):  # type: ignore[type-arg]
     model_class = None
