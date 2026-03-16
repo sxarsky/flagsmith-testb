@@ -69,7 +69,7 @@ from webhooks.webhooks import WebhookEventType
 
 from .constants import INTERSECTION, UNION
 from .features_service import get_overrides_data
-from .models import Feature, FeatureSegment, FeatureState
+from .models import Feature, FeatureSegment, FeatureState, FeatureHealthStatus
 from .multivariate.serializers import (
     FeatureMVOptionsValuesResponseSerializer,
 )
@@ -100,6 +100,7 @@ from .serializers import (  # type: ignore[attr-defined]
     SDKFeatureStatesQuerySerializer,
     UpdateFeatureSerializer,
     WritableNestedFeatureStateSerializer,
+    FeatureHealthStatusSerializer,
 )
 from .tasks import trigger_feature_state_change_webhooks
 from .versioning.versioning_service import (
@@ -1120,3 +1121,107 @@ def create_segment_override(  # type: ignore[no-untyped-def]
     serializer.is_valid(raise_exception=True)
     serializer.save(environment=environment, feature=feature)  # type: ignore[no-untyped-call]
     return Response(serializer.data, status=201)
+
+
+class FeatureHealthStatusViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for managing feature health monitoring.
+    """
+    permission_classes = [FeaturePermissions]
+    serializer_class = FeatureHealthStatusSerializer
+
+    def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            return FeatureHealthStatus.objects.none()
+
+        feature_id = self.kwargs.get("feature_pk")
+        return FeatureHealthStatus.objects.filter(feature_id=feature_id).select_related(
+            "feature", "environment"
+        )
+
+    @action(detail=False, methods=["GET"], url_path="project-report")
+    def project_health_report(self, request, *args, **kwargs):
+        """
+        Get health report for all features in a project.
+        """
+        project_id = self.kwargs.get("project_pk")
+        environment_id = request.query_params.get("environment_id")
+
+        filters = {"feature__project_id": project_id}
+        if environment_id:
+            filters["environment_id"] = environment_id
+
+        health_statuses = FeatureHealthStatus.objects.filter(**filters).select_related(
+            "feature", "environment"
+        ).order_by("-health_score")
+
+        serializer = self.get_serializer(health_statuses, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=["POST"], url_path="configure-alerts")
+    def configure_alerts(self, request, *args, **kwargs):
+        """
+        Configure health monitoring alerts for a feature.
+        """
+        feature_id = self.kwargs.get("feature_pk")
+        environment_id = request.data.get("environment_id")
+        alert_enabled = request.data.get("alert_enabled", True)
+
+        if not environment_id:
+            return Response(
+                {"error": "environment_id is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        health_status, created = FeatureHealthStatus.objects.get_or_create(
+            feature_id=feature_id,
+            environment_id=environment_id,
+        )
+
+        health_status.alert_triggered = alert_enabled
+        health_status.save()
+
+        return Response(
+            self.get_serializer(health_status).data,
+            status=status.HTTP_200_OK,
+        )
+
+    @action(detail=False, methods=["GET"], url_path="active-alerts")
+    def active_alerts(self, request, *args, **kwargs):
+        """
+        Get all active health alerts for a project.
+        """
+        project_id = self.kwargs.get("project_pk")
+
+        health_statuses = FeatureHealthStatus.objects.filter(
+            feature__project_id=project_id,
+            alert_triggered=True,
+            health_score__lt=80,
+        ).select_related("feature", "environment").order_by("-health_score")
+
+        serializer = self.get_serializer(health_statuses, many=True)
+        return Response(serializer.data)
+
+    def calculate_health_score(self, health_status):
+        """
+        Calculate health score based on various factors.
+        """
+        score = 100
+
+        # Reduce score based on error rate
+        if health_status.evaluation_error_rate > 0.05:  # 5% error rate
+            score -= 30
+        elif health_status.evaluation_error_rate > 0.01:  # 1% error rate
+            score -= 15
+
+        # Reduce score for zombie flags (not evaluated in 30+ days)
+        if health_status.is_zombie:
+            score -= 40
+
+        # Reduce score based on days since last change
+        if health_status.days_since_last_change > 90:
+            score -= 20
+        elif health_status.days_since_last_change > 60:
+            score -= 10
+
+        return max(0, min(100, score))

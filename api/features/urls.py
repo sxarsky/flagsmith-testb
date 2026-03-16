@@ -14,11 +14,13 @@ from features.views import (
     SimpleFeatureStateViewSet,
     get_feature_by_uuid,
     get_feature_state_by_uuid,
+    FeatureHealthStatusViewSet,
 )
 
 router = routers.DefaultRouter()
 router.register(r"featurestates", SimpleFeatureStateViewSet, basename="featurestates")
 router.register(r"feature-segments", FeatureSegmentViewSet, basename="feature-segment")
+router.register(r"health-status", FeatureHealthStatusViewSet, basename="health-status")
 
 app_name = "features"
 

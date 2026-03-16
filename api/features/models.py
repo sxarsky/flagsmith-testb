@@ -1170,3 +1170,19 @@ class FeatureStateValue(
 
     def _get_environment(self) -> typing.Optional["Environment"]:
         return self.feature_state.environment
+
+
+class FeatureHealthStatus(models.Model):
+    feature = models.ForeignKey(Feature, on_delete=models.CASCADE, related_name='health_status')
+    environment = models.ForeignKey('environments.Environment', on_delete=models.CASCADE)
+    health_score = models.IntegerField(default=100)  # 0-100
+    last_evaluated = models.DateTimeField(null=True, blank=True)
+    evaluation_error_rate = models.FloatField(default=0.0)
+    days_since_last_change = models.IntegerField(default=0)
+    is_zombie = models.BooleanField(default=False)  # Not evaluated in 30+ days
+    alert_triggered = models.BooleanField(default=False)
+    last_checked = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'feature_health_status'
+        unique_together = ['feature', 'environment']
