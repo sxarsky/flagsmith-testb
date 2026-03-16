@@ -22,6 +22,19 @@ from util.mappers.engine import (
 )
 
 
+class IdentityTraitHistory(models.Model):
+    identity = models.ForeignKey("Identity", on_delete=models.CASCADE, related_name='trait_history')
+    trait_key = models.CharField(max_length=200)
+    old_value = models.TextField(null=True, blank=True)
+    new_value = models.TextField()
+    changed_at = models.DateTimeField(auto_now_add=True)
+    changed_by = models.CharField(max_length=50)  # system, api, user
+
+    class Meta:
+        db_table = 'identity_trait_history'
+        ordering = ['-changed_at']
+
+
 class Identity(models.Model):
     identifier = models.CharField(max_length=2000)
     created_date = models.DateTimeField("DateCreated", auto_now_add=True)

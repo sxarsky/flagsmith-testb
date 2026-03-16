@@ -15,6 +15,7 @@ from django.views.decorators.vary import vary_on_headers
 from drf_spectacular.utils import extend_schema
 from flagsmith_schemas import api as api_schemas
 from rest_framework import status, viewsets
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -22,9 +23,10 @@ from app.pagination import CustomPagination
 from core.constants import FLAGSMITH_UPDATED_AT_HEADER, SDK_ENVIRONMENT_KEY_HEADER
 from core.request_origin import RequestOrigin
 from edge_api.identities.tasks import forward_identity_request
-from environments.identities.models import Identity
+from environments.identities.models import Identity, IdentityTraitHistory
 from environments.identities.serializers import (
     IdentitySerializer,
+    IdentityTraitHistorySerializer,
     SDKIdentitiesQuerySerializer,
 )
 from environments.models import Environment
@@ -330,3 +332,131 @@ class SDKIdentities(SDKAPIView):
         return Response(
             data=serializer.data, status=status.HTTP_200_OK, headers=headers
         )
+
+
+class IdentityTraitHistoryViewSet(viewsets.ReadOnlyModelViewSet):  # type: ignore[type-arg]
+    """
+    ViewSet for retrieving trait history for identities.
+    """
+    serializer_class = IdentityTraitHistorySerializer
+    pagination_class = CustomPagination
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):  # type: ignore[no-untyped-def]
+        if getattr(self, "swagger_fake_view", False):
+            return IdentityTraitHistory.objects.none()
+
+        identity_pk = self.kwargs.get("identity_pk")
+        return IdentityTraitHistory.objects.filter(identity_id=identity_pk)
+
+    def get_permissions(self):  # type: ignore[no-untyped-def]
+        return [
+            IsAuthenticated(),
+            NestedEnvironmentPermissions(
+                action_permission_map={
+                    "list": VIEW_IDENTITIES,
+                    "retrieve": VIEW_IDENTITIES,
+                    "traits_at_time": VIEW_IDENTITIES,
+                    "environment_trait_changes": VIEW_IDENTITIES,
+                },
+            ),
+        ]
+
+    @action(detail=False, methods=["get"], url_path="at-time")
+    def traits_at_time(self, request, environment_api_key=None, identity_pk=None):  # type: ignore[no-untyped-def]
+        """
+        Get all traits for an identity at a specific point in time.
+        Query param: timestamp (ISO format datetime)
+        """
+        timestamp_str = request.query_params.get("timestamp")
+        if not timestamp_str:
+            return Response(
+                {"detail": "timestamp query parameter is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            from django.utils.dateparse import parse_datetime
+            timestamp = parse_datetime(timestamp_str)
+            if timestamp is None:
+                raise ValueError("Invalid datetime format")
+        except (ValueError, TypeError):
+            return Response(
+                {"detail": "Invalid timestamp format. Use ISO format."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Get all trait history entries up to the specified time
+        history = IdentityTraitHistory.objects.filter(
+            identity_id=identity_pk, changed_at__lte=timestamp
+        ).order_by("trait_key", "-changed_at")
+
+        # Get the most recent value for each trait key at that time
+        traits_at_time = {}
+        for entry in history:
+            if entry.trait_key not in traits_at_time:
+                traits_at_time[entry.trait_key] = {
+                    "trait_key": entry.trait_key,
+                    "value": entry.new_value,
+                    "changed_at": entry.changed_at,
+                    "changed_by": entry.changed_by,
+                }
+
+        return Response(list(traits_at_time.values()), status=status.HTTP_200_OK)
+
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path="environment-changes",
+        url_name="environment-changes",
+    )
+    def environment_trait_changes(
+        self, request, environment_api_key=None, identity_pk=None
+    ):  # type: ignore[no-untyped-def]
+        """
+        Get all trait changes across all identities in an environment.
+        Query params: trait_key (optional), start_date (optional), end_date (optional)
+        """
+        environment = Environment.objects.get(api_key=environment_api_key)
+
+        # Get all identities in this environment
+        identity_ids = Identity.objects.filter(environment=environment).values_list(
+            "id", flat=True
+        )
+
+        queryset = IdentityTraitHistory.objects.filter(identity_id__in=identity_ids)
+
+        # Apply filters
+        trait_key = request.query_params.get("trait_key")
+        if trait_key:
+            queryset = queryset.filter(trait_key=trait_key)
+
+        start_date = request.query_params.get("start_date")
+        if start_date:
+            try:
+                from django.utils.dateparse import parse_datetime
+                start_dt = parse_datetime(start_date)
+                if start_dt:
+                    queryset = queryset.filter(changed_at__gte=start_dt)
+            except (ValueError, TypeError):
+                pass
+
+        end_date = request.query_params.get("end_date")
+        if end_date:
+            try:
+                from django.utils.dateparse import parse_datetime
+                end_dt = parse_datetime(end_date)
+                if end_dt:
+                    queryset = queryset.filter(changed_at__lte=end_dt)
+            except (ValueError, TypeError):
+                pass
+
+        queryset = queryset.order_by("-changed_at")
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
