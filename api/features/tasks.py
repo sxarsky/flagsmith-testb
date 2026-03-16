@@ -160,3 +160,73 @@ def _get_previous_multivariate_values(
 @register_task_handler()
 def delete_feature(feature_id: int) -> None:
     Feature.objects.get(pk=feature_id).delete()
+
+
+@register_task_handler()
+def check_feature_health() -> None:
+    """
+    Periodic task to check feature health across all environments.
+    Runs hourly to update health scores and detect zombie flags.
+    """
+    from datetime import timedelta
+    from django.utils import timezone
+    from .models import Feature, FeatureHealthStatus
+    from environments.models import Environment
+    
+    # Get all features and environments
+    features = Feature.objects.filter(is_archived=False)
+    environments = Environment.objects.all()
+    
+    for feature in features:
+        for environment in environments.filter(project=feature.project):
+            # Get or create health status
+            health_status, created = FeatureHealthStatus.objects.get_or_create(
+                feature=feature,
+                environment=environment,
+            )
+            
+            # Calculate days since last change
+            if feature.feature_states.filter(environment=environment).exists():
+                last_change = feature.feature_states.filter(
+                    environment=environment
+                ).order_by('-updated_at').first()
+                
+                if last_change:
+                    days_since_change = (timezone.now() - last_change.updated_at).days
+                    health_status.days_since_last_change = days_since_change
+            
+            # Check if flag is a zombie (not evaluated in 30+ days)
+            if health_status.last_evaluated:
+                days_since_eval = (timezone.now() - health_status.last_evaluated).days
+                health_status.is_zombie = days_since_eval > 30
+            else:
+                health_status.is_zombie = True
+            
+            # Calculate health score
+            score = 100
+            
+            # Reduce score based on error rate
+            if health_status.evaluation_error_rate > 0.05:
+                score -= 30
+            elif health_status.evaluation_error_rate > 0.01:
+                score -= 15
+            
+            # Reduce score for zombie flags
+            if health_status.is_zombie:
+                score -= 40
+            
+            # Reduce score based on days since last change
+            if health_status.days_since_last_change > 90:
+                score -= 20
+            elif health_status.days_since_last_change > 60:
+                score -= 10
+            
+            health_status.health_score = max(0, min(100, score))
+            
+            # Trigger alert if health score drops below threshold
+            if health_status.health_score < 80:
+                health_status.alert_triggered = True
+            
+            health_status.save()
+    
+    logger.info(f"Feature health check completed for {features.count()} features across {environments.count()} environments")
