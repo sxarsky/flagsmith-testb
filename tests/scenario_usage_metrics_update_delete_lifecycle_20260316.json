@@ -1,0 +1,80 @@
+[
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"feature\": 1, \"environment\": 1, \"evaluation_count\": 500, \"unique_identities_count\": 100, \"period_start\": \"2026-03-01T00:00:00Z\", \"period_end\": \"2026-03-15T00:00:00Z\"}",
+    "ResponseBody": "{\"id\": 1, \"feature\": 1, \"feature_name\": \"test_flag\", \"environment\": 1, \"environment_name\": \"Production\", \"evaluation_count\": 500, \"unique_identities_count\": 100, \"last_evaluated_at\": null, \"period_start\": \"2026-03-01T00:00:00Z\", \"period_end\": \"2026-03-15T00:00:00Z\", \"created_at\": \"2026-03-16T10:00:00Z\", \"updated_at\": \"2026-03-16T10:00:00Z\"}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Bearer SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "POST",
+    "Path": "/api/v1/usage-metrics/",
+    "QueryParams": {},
+    "StatusCode": 201,
+    "Port": 8000,
+    "Timestamp": "2026-03-16T22:52:32.456Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"feature\": 1, \"environment\": 1, \"evaluation_count\": 2000, \"unique_identities_count\": 450, \"period_start\": \"2026-03-01T00:00:00Z\", \"period_end\": \"2026-03-15T00:00:00Z\"}",
+    "ResponseBody": "{\"id\": 1, \"feature\": 1, \"feature_name\": \"test_flag\", \"environment\": 1, \"environment_name\": \"Production\", \"evaluation_count\": 2000, \"unique_identities_count\": 450, \"last_evaluated_at\": null, \"period_start\": \"2026-03-01T00:00:00Z\", \"period_end\": \"2026-03-15T00:00:00Z\", \"created_at\": \"2026-03-16T10:00:00Z\", \"updated_at\": \"2026-03-16T10:05:00Z\"}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Bearer SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "PUT",
+    "Path": "/api/v1/usage-metrics/1/",
+    "QueryParams": {},
+    "StatusCode": 200,
+    "Port": 8000,
+    "Timestamp": "2026-03-16T22:52:37.639Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "",
+    "ResponseBody": "{}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Bearer SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "DELETE",
+    "Path": "/api/v1/usage-metrics/1/",
+    "QueryParams": {},
+    "StatusCode": 204,
+    "Port": 8000,
+    "Timestamp": "2026-03-16T22:52:41.072Z",
+    "Scheme": "http"
+  }
+]
