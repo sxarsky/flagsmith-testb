@@ -1170,3 +1170,53 @@ class FeatureStateValue(
 
     def _get_environment(self) -> typing.Optional["Environment"]:
         return self.feature_state.environment
+
+
+class FeatureCostProfile(models.Model):
+    """
+    Tracks infrastructure costs associated with feature flags.
+    Finance teams can allocate costs to projects or features for chargeback.
+    """
+    feature = models.ForeignKey(
+        Feature,
+        on_delete=models.CASCADE,
+        related_name='cost_profile'
+    )
+    cost_per_evaluation = models.DecimalField(
+        max_digits=10,
+        decimal_places=6,
+        default=0,
+        help_text="Cost per flag evaluation (for API-heavy features)"
+    )
+    fixed_monthly_cost = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0,
+        help_text="Fixed monthly cost (for always-on infrastructure)"
+    )
+    cost_category = models.CharField(
+        max_length=50,
+        choices=[
+            ('compute', 'Compute'),
+            ('storage', 'Storage'),
+            ('api_calls', 'API Calls'),
+            ('network', 'Network'),
+            ('other', 'Other')
+        ],
+        default='compute'
+    )
+    currency = models.CharField(
+        max_length=3,
+        default='USD',
+        help_text="ISO 4217 currency code"
+    )
+    notes = models.TextField(blank=True, default='')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'feature_cost_profile'
+        unique_together = [['feature', 'cost_category']]
+
+    def __str__(self):
+        return f"Cost Profile for {self.feature.name} - {self.cost_category}"
