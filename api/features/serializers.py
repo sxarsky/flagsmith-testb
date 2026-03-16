@@ -734,5 +734,5 @@ class CustomCreateSegmentOverrideFeatureStateSerializer(
 
 class FeatureCostProfileSerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
     class Meta:
-        model = FeatureCostProfile
+        model = 'features.FeatureCostProfile'
         fields = '__all__'
