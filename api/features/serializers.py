@@ -730,3 +730,42 @@ class CustomCreateSegmentOverrideFeatureStateSerializer(
                 {"environment": SEGMENT_OVERRIDE_LIMIT_EXCEEDED_MESSAGE}
             )
         return super().create(validated_data)  # type: ignore[no-any-return,no-untyped-call]
+
+
+class FeatureHealthStatusSerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
+    """
+    Serializer for feature flag health status.
+    """
+    feature_name = serializers.CharField(source='feature.name', read_only=True)
+    environment_name = serializers.CharField(source='environment.name', read_only=True)
+
+    class Meta:
+        model = 'features.FeatureHealthStatus'  # String reference to avoid import timing issues
+        fields = [
+            'id',
+            'feature',
+            'feature_name',
+            'environment',
+            'environment_name',
+            'health_score',
+            'last_evaluated',
+            'evaluation_error_rate',
+            'days_since_last_change',
+            'is_zombie',
+            'alert_triggered',
+            'last_check_at',
+            'created_at'
+        ]
+        read_only_fields = ['id', 'last_check_at', 'created_at']
+
+    def validate_health_score(self, value):  # type: ignore[no-untyped-def]
+        """Ensure health score is between 0 and 100."""
+        if not 0 <= value <= 100:
+            raise serializers.ValidationError("Health score must be between 0 and 100.")
+        return value
+
+    def validate_evaluation_error_rate(self, value):  # type: ignore[no-untyped-def]
+        """Ensure error rate is between 0 and 100."""
+        if not 0 <= value <= 100:
+            raise serializers.ValidationError("Error rate must be between 0 and 100.")
+        return value
