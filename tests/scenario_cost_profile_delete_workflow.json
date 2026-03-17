@@ -1,0 +1,80 @@
+[
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"feature\": 1, \"cost_per_evaluation\": \"0.000050\", \"fixed_monthly_cost\": \"100.00\", \"cost_category\": \"network\", \"currency\": \"USD\", \"notes\": \"Network egress costs for flag distribution\"}",
+    "ResponseBody": "{\"id\": 99, \"feature\": 1, \"feature_name\": \"my_feature\", \"cost_per_evaluation\": \"0.000050\", \"fixed_monthly_cost\": \"100.00\", \"cost_category\": \"network\", \"currency\": \"USD\", \"notes\": \"Network egress costs for flag distribution\", \"created_at\": \"2026-03-16T00:00:00Z\", \"updated_at\": \"2026-03-16T00:00:00Z\"}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Token SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "POST",
+    "Path": "/api/v1/features/cost-profiles/",
+    "QueryParams": {},
+    "StatusCode": 201,
+    "Port": 8000,
+    "Timestamp": "2026-03-16T23:06:47.137Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "",
+    "ResponseBody": "{}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Token SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "DELETE",
+    "Path": "/api/v1/features/cost-profiles/99/",
+    "QueryParams": {},
+    "StatusCode": 204,
+    "Port": 8000,
+    "Timestamp": "2026-03-16T23:06:50.890Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "",
+    "ResponseBody": "{\"detail\": \"Not found.\"}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Token SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "GET",
+    "Path": "/api/v1/features/cost-profiles/99/",
+    "QueryParams": {},
+    "StatusCode": 404,
+    "Port": 8000,
+    "Timestamp": "2026-03-16T23:06:55.070Z",
+    "Scheme": "http"
+  }
+]
