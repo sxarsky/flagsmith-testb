@@ -11,6 +11,7 @@ from features.import_export.views import (
     feature_import,
 )
 from features.views import (
+    FeatureUsageMetricsViewSet,
     SimpleFeatureStateViewSet,
     get_feature_by_uuid,
     get_feature_state_by_uuid,
@@ -19,6 +20,7 @@ from features.views import (
 router = routers.DefaultRouter()
 router.register(r"featurestates", SimpleFeatureStateViewSet, basename="featurestates")
 router.register(r"feature-segments", FeatureSegmentViewSet, basename="feature-segment")
+router.register(r"usage-metrics", FeatureUsageMetricsViewSet, basename="usage-metrics")
 
 app_name = "features"
 

@@ -46,7 +46,7 @@ from .feature_segments.limits import (
 from .feature_segments.serializers import (
     CustomCreateSegmentOverrideFeatureSegmentSerializer,
 )
-from .models import Feature, FeatureState
+from .models import Feature, FeatureState, FeatureUsageMetrics
 from .multivariate.serializers import NestedMultivariateFeatureOptionSerializer
 
 
@@ -730,3 +730,38 @@ class CustomCreateSegmentOverrideFeatureStateSerializer(
                 {"environment": SEGMENT_OVERRIDE_LIMIT_EXCEEDED_MESSAGE}
             )
         return super().create(validated_data)  # type: ignore[no-any-return,no-untyped-call]
+
+
+class FeatureUsageMetricsSerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
+    """
+    Serializer for feature flag usage analytics.
+    """
+    feature_name = serializers.CharField(source='feature.name', read_only=True)
+    environment_name = serializers.CharField(source='environment.name', read_only=True)
+
+    class Meta:
+        model = FeatureUsageMetrics
+        fields = [
+            'id',
+            'feature',
+            'feature_name',
+            'environment',
+            'environment_name',
+            'evaluation_count',
+            'unique_identities_count',
+            'last_evaluated_at',
+            'period_start',
+            'period_end',
+            'created_at',
+            'updated_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at']
+
+    def validate(self, data):  # type: ignore[no-untyped-def]
+        """Ensure period_end is after period_start."""
+        if 'period_start' in data and 'period_end' in data:
+            if data['period_end'] <= data['period_start']:
+                raise serializers.ValidationError(
+                    "period_end must be after period_start"
+                )
+        return data

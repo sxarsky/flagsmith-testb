@@ -69,7 +69,7 @@ from webhooks.webhooks import WebhookEventType
 
 from .constants import INTERSECTION, UNION
 from .features_service import get_overrides_data
-from .models import Feature, FeatureSegment, FeatureState
+from .models import Feature, FeatureSegment, FeatureState, FeatureUsageMetrics
 from .multivariate.serializers import (
     FeatureMVOptionsValuesResponseSerializer,
 )
@@ -92,6 +92,7 @@ from .serializers import (  # type: ignore[attr-defined]
     FeatureStateSerializerCreate,
     FeatureStateSerializerWithIdentity,
     FeatureStateValueSerializer,
+    FeatureUsageMetricsSerializer,
     GetInfluxDataQuerySerializer,
     GetUsageDataQuerySerializer,
     ListFeatureSerializer,
@@ -1120,3 +1121,78 @@ def create_segment_override(  # type: ignore[no-untyped-def]
     serializer.is_valid(raise_exception=True)
     serializer.save(environment=environment, feature=feature)  # type: ignore[no-untyped-call]
     return Response(serializer.data, status=201)
+
+
+class FeatureUsageMetricsViewSet(viewsets.ModelViewSet):  # type: ignore[type-arg]
+    """
+    ViewSet for managing feature flag usage analytics.
+
+    Endpoints:
+    - GET /api/v1/usage-metrics/ - List all usage metrics
+    - GET /api/v1/usage-metrics/{id}/ - Get specific metrics
+    - POST /api/v1/usage-metrics/ - Create metrics record
+    - PUT /api/v1/usage-metrics/{id}/ - Update metrics
+    - POST /api/v1/usage-metrics/reset/ - Reset all counters
+    """
+    serializer_class = FeatureUsageMetricsSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):  # type: ignore[no-untyped-def]
+        queryset = FeatureUsageMetrics.objects.all().select_related('feature', 'environment')
+
+        # Filter by feature if provided
+        feature_id = self.request.query_params.get('feature_id')
+        if feature_id:
+            queryset = queryset.filter(feature_id=feature_id)
+
+        # Filter by environment if provided
+        environment_id = self.request.query_params.get('environment_id')
+        if environment_id:
+            queryset = queryset.filter(environment_id=environment_id)
+
+        # Filter by date range
+        from_date = self.request.query_params.get('from_date')
+        to_date = self.request.query_params.get('to_date')
+        if from_date:
+            queryset = queryset.filter(period_start__gte=from_date)
+        if to_date:
+            queryset = queryset.filter(period_end__lte=to_date)
+
+        return queryset
+
+    @action(detail=False, methods=['get'], url_path='summary')
+    def summary(self, request):  # type: ignore[no-untyped-def]
+        """Get usage summary across all features."""
+        from django.db.models import Sum
+
+        queryset = self.get_queryset()
+
+        summary = {
+            'total_evaluations': queryset.aggregate(
+                total=Sum('evaluation_count')
+            )['total'] or 0,
+            'total_unique_identities': queryset.aggregate(
+                total=Sum('unique_identities_count')
+            )['total'] or 0,
+            'feature_count': queryset.values('feature').distinct().count()
+        }
+
+        return Response(summary)
+
+    @action(detail=False, methods=['post'], url_path='reset')
+    def reset(self, request):  # type: ignore[no-untyped-def]
+        """Reset usage counters for specified features."""
+        feature_ids = request.data.get('feature_ids', [])
+
+        if feature_ids:
+            queryset = self.get_queryset().filter(feature_id__in=feature_ids)
+        else:
+            queryset = self.get_queryset()
+
+        count = queryset.update(
+            evaluation_count=0,
+            unique_identities_count=0,
+            last_evaluated_at=None
+        )
+
+        return Response({'reset_count': count})
