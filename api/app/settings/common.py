@@ -310,7 +310,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "custom_auth.jwt_cookie.authentication.JWTCookieAuthentication",
-        "rest_framework.authentication.TokenAuthentication",
+        "custom_auth.flexible_token_auth.FlexibleTokenAuthentication",  # Accepts both "Token" and "Bearer" prefixes
         "api_keys.authentication.MasterAPIKeyAuthentication",
     ),
     "PAGE_SIZE": 10,
