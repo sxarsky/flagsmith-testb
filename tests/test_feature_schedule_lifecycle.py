@@ -28,7 +28,7 @@ def test_integration():
         headers["Authorization"] = "Token " + os.getenv("SKYRAMP_TEST_TOKEN")
 
     # Declaration of variables
-    environment = "1"
+    environment = 1
 
     # Request Body
     endpoint_1_POST_request_body = r'''{
@@ -78,7 +78,7 @@ def test_integration():
         path="/api/v1/features/schedules/{schedules}/",
         method="GET",
         headers=headers,
-        path_params={"schedules": skyramp.get_response_value(endpoint_1_POST_response, "status")}
+        path_params={"schedules": skyramp.get_response_value(endpoint_1_POST_response, "id")}
     )
     # Generated Assertions
     assert endpoint_2_GET_1_response.status_code == 200
