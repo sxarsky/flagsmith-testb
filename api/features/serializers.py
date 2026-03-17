@@ -46,7 +46,7 @@ from .feature_segments.limits import (
 from .feature_segments.serializers import (
     CustomCreateSegmentOverrideFeatureSegmentSerializer,
 )
-from .models import Feature, FeatureState
+from .models import Feature, FeatureCostProfile, FeatureState
 from .multivariate.serializers import NestedMultivariateFeatureOptionSerializer
 
 
@@ -730,3 +730,38 @@ class CustomCreateSegmentOverrideFeatureStateSerializer(
                 {"environment": SEGMENT_OVERRIDE_LIMIT_EXCEEDED_MESSAGE}
             )
         return super().create(validated_data)  # type: ignore[no-any-return,no-untyped-call]
+
+
+class FeatureCostProfileSerializer(serializers.ModelSerializer):
+    """
+    Serializer for feature flag cost profiles.
+    """
+    feature_name = serializers.CharField(source='feature.name', read_only=True)
+
+    class Meta:
+        model = FeatureCostProfile
+        fields = [
+            'id',
+            'feature',
+            'feature_name',
+            'cost_per_evaluation',
+            'fixed_monthly_cost',
+            'cost_category',
+            'currency',
+            'notes',
+            'created_at',
+            'updated_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at']
+
+    def validate_cost_per_evaluation(self, value):
+        """Ensure cost is non-negative."""
+        if value < 0:
+            raise serializers.ValidationError("Cost per evaluation must be non-negative.")
+        return value
+
+    def validate_fixed_monthly_cost(self, value):
+        """Ensure cost is non-negative."""
+        if value < 0:
+            raise serializers.ValidationError("Fixed monthly cost must be non-negative.")
+        return value
