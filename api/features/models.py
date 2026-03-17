@@ -1170,3 +1170,51 @@ class FeatureStateValue(
 
     def _get_environment(self) -> typing.Optional["Environment"]:
         return self.feature_state.environment
+
+
+class FeatureSchedule(models.Model):
+    """
+    Represents a scheduled change to a feature flag's enabled state.
+    Allows teams to schedule flag changes in advance (e.g., enable a feature at midnight).
+    """
+    feature = models.ForeignKey(
+        Feature,
+        on_delete=models.CASCADE,
+        related_name='schedules'
+    )
+    environment = models.ForeignKey(
+        'environments.Environment',
+        on_delete=models.CASCADE,
+        related_name='feature_schedules'
+    )
+    scheduled_at = models.DateTimeField(
+        help_text="When this change should take effect"
+    )
+    new_enabled_state = models.BooleanField(
+        help_text="The enabled state to set when the schedule executes"
+    )
+    created_by = models.ForeignKey(
+        'users.FFAdminUser',
+        on_delete=models.CASCADE,
+        related_name='created_schedules'
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ('pending', 'Pending'),
+            ('executed', 'Executed'),
+            ('cancelled', 'Cancelled')
+        ],
+        default='pending'
+    )
+    executed_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'feature_schedule'
+        ordering = ['scheduled_at']
+
+    def __str__(self):
+        return f"Schedule {self.feature.name} -> {self.new_enabled_state} at {self.scheduled_at}"
+# Testing FlexibleTokenAuthentication with Bearer prefix

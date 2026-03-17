@@ -46,7 +46,7 @@ from .feature_segments.limits import (
 from .feature_segments.serializers import (
     CustomCreateSegmentOverrideFeatureSegmentSerializer,
 )
-from .models import Feature, FeatureState
+from .models import Feature, FeatureSchedule, FeatureState
 from .multivariate.serializers import NestedMultivariateFeatureOptionSerializer
 
 
@@ -730,3 +730,38 @@ class CustomCreateSegmentOverrideFeatureStateSerializer(
                 {"environment": SEGMENT_OVERRIDE_LIMIT_EXCEEDED_MESSAGE}
             )
         return super().create(validated_data)  # type: ignore[no-any-return,no-untyped-call]
+
+
+class FeatureScheduleSerializer(serializers.ModelSerializer):
+    """
+    Serializer for scheduled feature flag changes.
+    """
+    feature_name = serializers.CharField(source='feature.name', read_only=True)
+    environment_name = serializers.CharField(source='environment.name', read_only=True)
+    created_by_email = serializers.CharField(source='created_by.email', read_only=True)
+
+    class Meta:
+        model = FeatureSchedule
+        fields = [
+            'id',
+            'feature',
+            'feature_name',
+            'environment',
+            'environment_name',
+            'scheduled_at',
+            'new_enabled_state',
+            'created_by',
+            'created_by_email',
+            'status',
+            'executed_at',
+            'created_at',
+            'updated_at'
+        ]
+        read_only_fields = ['id', 'status', 'executed_at', 'created_at', 'updated_at']
+
+    def validate_scheduled_at(self, value):
+        """Ensure scheduled time is in the future."""
+        from django.utils import timezone
+        if value <= timezone.now():
+            raise serializers.ValidationError("Scheduled time must be in the future.")
+        return value
