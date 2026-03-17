@@ -1175,7 +1175,7 @@ class FeatureStateValue(
 class FeatureSchedule(models.Model):
     """
     Represents a scheduled change to a feature flag's enabled state.
-    Allows teams to schedule flag changes in advance.
+    Allows teams to schedule flag changes in advance (e.g., enable a feature at midnight).
     """
     feature = models.ForeignKey(
         Feature,
