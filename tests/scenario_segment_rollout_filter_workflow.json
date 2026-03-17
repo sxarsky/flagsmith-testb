@@ -1,0 +1,54 @@
+[
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "",
+    "ResponseBody": "[{\"id\": 1, \"feature\": 1, \"feature_name\": \"dark_mode\", \"segment\": 1, \"segment_name\": \"beta_users\", \"environment\": 1, \"environment_name\": \"Production\", \"rollout_percentage\": 100, \"rollout_strategy\": \"consistent_hash\", \"priority\": 0}]",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Token SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "GET",
+    "Path": "/api/v1/segment-rollouts/",
+    "QueryParams": {},
+    "StatusCode": 200,
+    "Port": 8000,
+    "Timestamp": "2026-03-17T14:51:54.151Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "",
+    "ResponseBody": "[{\"id\": 1, \"feature\": 1, \"feature_name\": \"dark_mode\", \"segment\": 1, \"segment_name\": \"beta_users\", \"environment\": 1, \"environment_name\": \"Production\", \"rollout_percentage\": 100, \"rollout_strategy\": \"consistent_hash\", \"priority\": 0}]",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Token SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "GET",
+    "Path": "/api/v1/segment-rollouts/",
+    "QueryParams": {},
+    "StatusCode": 200,
+    "Port": 8000,
+    "Timestamp": "2026-03-17T14:52:10.329Z",
+    "Scheme": "http"
+  }
+]
