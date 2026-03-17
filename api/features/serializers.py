@@ -46,7 +46,7 @@ from .feature_segments.limits import (
 from .feature_segments.serializers import (
     CustomCreateSegmentOverrideFeatureSegmentSerializer,
 )
-from .models import Feature, FeatureState
+from .models import Feature, FeatureSegment, FeatureState
 from .multivariate.serializers import NestedMultivariateFeatureOptionSerializer
 
 
@@ -741,7 +741,7 @@ class SegmentRolloutSerializer(serializers.ModelSerializer):  # type: ignore[typ
     environment_name = serializers.CharField(source='environment.name', read_only=True)
 
     class Meta:
-        model = 'features.FeatureSegment'  # String reference to avoid import timing issues
+        model = FeatureSegment
         fields = [
             'id',
             'feature',
