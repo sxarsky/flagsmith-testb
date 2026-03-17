@@ -46,7 +46,7 @@ from .feature_segments.limits import (
 from .feature_segments.serializers import (
     CustomCreateSegmentOverrideFeatureSegmentSerializer,
 )
-from .models import Feature, FeatureState
+from .models import Feature, FeatureState, FeatureUsageMetrics
 from .multivariate.serializers import NestedMultivariateFeatureOptionSerializer
 
 
@@ -740,7 +740,7 @@ class FeatureUsageMetricsSerializer(serializers.ModelSerializer):  # type: ignor
     environment_name = serializers.CharField(source='environment.name', read_only=True)
 
     class Meta:
-        model = 'features.FeatureUsageMetrics'  # String reference to avoid import timing issues
+        model = FeatureUsageMetrics
         fields = [
             'id',
             'feature',
