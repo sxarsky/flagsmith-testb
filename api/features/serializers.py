@@ -46,7 +46,7 @@ from .feature_segments.limits import (
 from .feature_segments.serializers import (
     CustomCreateSegmentOverrideFeatureSegmentSerializer,
 )
-from .models import Feature, FeatureState
+from .models import Feature, FeatureSchedule, FeatureState
 from .multivariate.serializers import NestedMultivariateFeatureOptionSerializer
 
 
@@ -741,7 +741,7 @@ class FeatureScheduleSerializer(serializers.ModelSerializer):
     created_by_email = serializers.CharField(source='created_by.email', read_only=True)
 
     class Meta:
-        model = 'features.FeatureSchedule'  # String reference to avoid import timing issues
+        model = FeatureSchedule
         fields = [
             'id',
             'feature',
