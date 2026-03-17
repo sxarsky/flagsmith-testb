@@ -40,6 +40,8 @@ def test_endpoint_1_get():
 
     # Generated Assertions
     assert endpoint_1_GET_response.status_code == 200
+    assert "rollout_percentage" in skyramp.get_response_value(endpoint_1_GET_response, "")
+    assert "rollout_strategy" in skyramp.get_response_value(endpoint_1_GET_response, "")
 
 
 if __name__ == "__main__":

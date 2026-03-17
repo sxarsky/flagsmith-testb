@@ -70,6 +70,7 @@ def test_integration():
     )
     # Generated Assertions
     assert endpoint_2_POST_response.status_code == 200
+    assert skyramp.get_response_value(endpoint_2_POST_response, "rollout_percentage") == 100
 
 
 if __name__ == "__main__":

@@ -47,6 +47,7 @@ def test_increase_post():
 
     # Generated Assertions
     assert increase_POST_response.status_code == 200
+    assert "rollout_percentage" in skyramp.get_response_value(increase_POST_response, "")
 
 
 if __name__ == "__main__":
