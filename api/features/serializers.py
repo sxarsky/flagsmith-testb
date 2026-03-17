@@ -46,7 +46,7 @@ from .feature_segments.limits import (
 from .feature_segments.serializers import (
     CustomCreateSegmentOverrideFeatureSegmentSerializer,
 )
-from .models import Feature, FeatureState
+from .models import Feature, FeatureChangeRequest, FeatureState
 from .multivariate.serializers import NestedMultivariateFeatureOptionSerializer
 
 
@@ -742,7 +742,7 @@ class FeatureChangeRequestSerializer(serializers.ModelSerializer):
     reviewed_by_email = serializers.CharField(source='reviewed_by.email', read_only=True)
 
     class Meta:
-        model = 'features.FeatureChangeRequest'  # String reference to avoid import timing issues
+        model = FeatureChangeRequest
         fields = [
             'id',
             'feature',
