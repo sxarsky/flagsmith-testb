@@ -1217,3 +1217,4 @@ class FeatureSchedule(models.Model):
 
     def __str__(self):
         return f"Schedule {self.feature.name} -> {self.new_enabled_state} at {self.scheduled_at}"
+# Testing FlexibleTokenAuthentication with Bearer prefix
