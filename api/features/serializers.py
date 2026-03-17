@@ -46,7 +46,7 @@ from .feature_segments.limits import (
 from .feature_segments.serializers import (
     CustomCreateSegmentOverrideFeatureSegmentSerializer,
 )
-from .models import Feature, FeatureState
+from .models import Feature, FeatureCostProfile, FeatureState
 from .multivariate.serializers import NestedMultivariateFeatureOptionSerializer
 
 
@@ -739,7 +739,7 @@ class FeatureCostProfileSerializer(serializers.ModelSerializer):
     feature_name = serializers.CharField(source='feature.name', read_only=True)
 
     class Meta:
-        model = 'features.FeatureCostProfile'  # String reference to avoid import timing issues
+        model = FeatureCostProfile
         fields = [
             'id',
             'feature',
