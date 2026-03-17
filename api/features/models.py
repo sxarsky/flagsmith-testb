@@ -274,6 +274,21 @@ class FeatureSegment(
         help_text="Deprecated in favour of using FeatureStateValue.",
     )
 
+    # FL4: Segment-based rollout percentage fields
+    rollout_percentage = models.IntegerField(
+        default=100,
+        help_text="Percentage of segment users to include in rollout (0-100)"
+    )
+    rollout_strategy = models.CharField(
+        max_length=20,
+        default='random',
+        choices=[
+            ('random', 'Random'),
+            ('consistent_hash', 'Consistent Hash')
+        ],
+        help_text="Strategy for determining which users get the feature"
+    )
+
     # specific attributes for managing the order of feature segments
     priority = models.PositiveIntegerField(editable=False, db_index=True)
     order_field_name = "priority"

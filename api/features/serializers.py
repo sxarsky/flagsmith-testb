@@ -46,7 +46,7 @@ from .feature_segments.limits import (
 from .feature_segments.serializers import (
     CustomCreateSegmentOverrideFeatureSegmentSerializer,
 )
-from .models import Feature, FeatureState
+from .models import Feature, FeatureSegment, FeatureState
 from .multivariate.serializers import NestedMultivariateFeatureOptionSerializer
 
 
@@ -730,3 +730,36 @@ class CustomCreateSegmentOverrideFeatureStateSerializer(
                 {"environment": SEGMENT_OVERRIDE_LIMIT_EXCEEDED_MESSAGE}
             )
         return super().create(validated_data)  # type: ignore[no-any-return,no-untyped-call]
+
+
+class SegmentRolloutSerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
+    """
+    Serializer for segment rollout configuration.
+    """
+    feature_name = serializers.CharField(source='feature.name', read_only=True)
+    segment_name = serializers.CharField(source='segment.name', read_only=True)
+    environment_name = serializers.CharField(source='environment.name', read_only=True)
+
+    class Meta:
+        model = FeatureSegment
+        fields = [
+            'id',
+            'feature',
+            'feature_name',
+            'segment',
+            'segment_name',
+            'environment',
+            'environment_name',
+            'rollout_percentage',
+            'rollout_strategy',
+            'priority'
+        ]
+        read_only_fields = ['id', 'priority']
+
+    def validate_rollout_percentage(self, value):  # type: ignore[no-untyped-def]
+        """Ensure rollout percentage is between 0 and 100."""
+        if not 0 <= value <= 100:
+            raise serializers.ValidationError(
+                "Rollout percentage must be between 0 and 100."
+            )
+        return value
