@@ -1128,29 +1128,28 @@ class FeatureScheduleViewSet(viewsets.ModelViewSet):  # type: ignore[type-arg]
     ViewSet for managing scheduled feature flag changes.
 
     Endpoints:
-    - POST /api/v1/features/{feature_id}/schedules/ - Create a schedule
-    - GET /api/v1/features/{feature_id}/schedules/ - List schedules for a feature
-    - GET /api/v1/features/{feature_id}/schedules/{id}/ - Get schedule details
-    - DELETE /api/v1/features/{feature_id}/schedules/{id}/ - Cancel a schedule
+    - POST /api/v1/features/schedules/ - Create a schedule
+    - GET /api/v1/features/schedules/ - List all schedules
+    - GET /api/v1/features/schedules/{id}/ - Get schedule details
+    - DELETE /api/v1/features/schedules/{id}/ - Cancel a schedule
+    - GET /api/v1/features/schedules/pending/ - List pending schedules
     """
     serializer_class = FeatureScheduleSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):  # type: ignore[no-untyped-def]
-        feature_id = self.kwargs.get('feature_pk')
-        if feature_id:
-            return FeatureSchedule.objects.filter(feature_id=feature_id).select_related(
-                'feature', 'environment', 'created_by'
-            )
-        return FeatureSchedule.objects.none()
+        """Return all schedules with related data optimized."""
+        return FeatureSchedule.objects.select_related(
+            'feature', 'environment', 'created_by'
+        ).all()
 
     def perform_create(self, serializer):  # type: ignore[no-untyped-def]
-        feature = get_object_or_404(Feature, pk=self.kwargs['feature_pk'])
-        serializer.save(feature=feature, created_by=self.request.user)
+        """Save schedule with the authenticated user as creator."""
+        serializer.save(created_by=self.request.user)
 
     @action(detail=False, methods=['get'], url_path='pending')
-    def pending(self, request, feature_pk=None):  # type: ignore[no-untyped-def]
-        """Get all pending schedules for this feature."""
+    def pending(self, request):  # type: ignore[no-untyped-def]
+        """Get all pending schedules across all features."""
         queryset = self.get_queryset().filter(status='pending')
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
