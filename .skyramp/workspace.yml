@@ -1,15 +1,5 @@
-testDirectory: tests
-targetSetupCommand: ./deployment-testbot/setup.sh
-authTokenCommand: ./deployment-testbot/get-token.sh
-targetReadyCheckCommand: curl -f http://localhost:8000/health
-targetReadyCheckTimeout: 120
-
 services:
   - serviceName: flagsmith-api
     language: python
     framework: pytest
-    baseUrl: http://localhost:8000
     outputDir: tests
-    auth:
-      type: token
-      scheme: Token  # Django REST Framework uses "Token" prefix, not "Bearer"
