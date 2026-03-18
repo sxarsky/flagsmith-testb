@@ -66,6 +66,7 @@ def test_integration():
     )
     # Generated Assertions
     assert endpoint_2_POST_response.status_code == 200
+    assert "reset_count" in endpoint_2_POST_response.json()
 
     # Execute Request
     endpoint_3_GET_response = client.send_request(

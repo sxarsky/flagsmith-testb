@@ -58,6 +58,9 @@ def test_integration():
     )
     # Generated Assertions
     assert endpoint_2_GET_response.status_code == 200
+    assert "total_evaluations" in endpoint_2_GET_response.json()
+    assert "total_unique_identities" in endpoint_2_GET_response.json()
+    assert "feature_count" in endpoint_2_GET_response.json()
 
 
 if __name__ == "__main__":

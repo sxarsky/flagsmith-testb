@@ -88,7 +88,7 @@ def test_integration():
         headers=headers
     )
     # Generated Assertions
-    assert endpoint_2_POST_response.status_code == 201
+    assert endpoint_2_POST_response.status_code == 200
 
 
 if __name__ == "__main__":

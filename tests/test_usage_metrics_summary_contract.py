@@ -39,6 +39,9 @@ def test_summary_get():
 
     # Generated Assertions
     assert summary_GET_response.status_code == 200
+    assert "total_evaluations" in summary_GET_response.json()
+    assert "total_unique_identities" in summary_GET_response.json()
+    assert "feature_count" in summary_GET_response.json()
 
 
 if __name__ == "__main__":
