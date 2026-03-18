@@ -9,7 +9,11 @@ from environments.identities.traits.views import SDKTraits
 from environments.identities.views import SDKIdentities
 from environments.sdk.views import SDKEnvironmentAPIView
 from features.feature_health.views import feature_health_webhook
-from features.views import SDKFeatureStates, get_multivariate_options
+from features.views import (
+    SDKFeatureStates,
+    SegmentRolloutViewSet,
+    get_multivariate_options,
+)
 from integrations.github.views import github_webhook
 from organisations.views import chargebee_webhook
 
@@ -21,6 +25,9 @@ schema_view_permission_class = (  # pragma: no cover
 
 traits_router = routers.DefaultRouter()
 traits_router.register(r"", SDKTraits, basename="sdk-traits")
+
+segment_rollouts_router = routers.DefaultRouter()
+segment_rollouts_router.register(r"", SegmentRolloutViewSet, basename="segment-rollout")
 
 app_name = "v1"
 
@@ -59,6 +66,7 @@ urlpatterns = [
     ),
     re_path(r"^identities/$", SDKIdentities.as_view(), name="sdk-identities"),
     re_path(r"^traits/", include(traits_router.urls), name="traits"),
+    re_path(r"^segment-rollouts/", include(segment_rollouts_router.urls), name="segment-rollouts"),
     re_path(r"^analytics/flags/$", SDKAnalyticsFlags.as_view(), name="analytics-flags"),
     re_path(r"^analytics/telemetry/$", SelfHostedTelemetryAPIView.as_view()),
     re_path(
