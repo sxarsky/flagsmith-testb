@@ -29,7 +29,7 @@ def test_segment_rollouts_get():
         headers["Authorization"] = "Token " + os.getenv("SKYRAMP_TEST_TOKEN")
 
     # Execute Request
-    segment-rollouts_GET_response = client.send_request(
+    segment_rollouts_GET_response = client.send_request(
         url=URL,
         path="/api/v1/segment-rollouts/",
         method="GET",
@@ -37,7 +37,11 @@ def test_segment_rollouts_get():
     )
 
     # Generated Assertions
-    assert skyramp.check_status_code(segment-rollouts_GET_response, "20x")
+    assert skyramp.check_status_code(segment_rollouts_GET_response, "20x")
+    first_item = skyramp.get_response_value(segment_rollouts_GET_response, "results.0")
+    if first_item is not None:
+        assert "rollout_percentage" in first_item
+        assert "rollout_strategy" in first_item
 
 
 if __name__ == "__main__":

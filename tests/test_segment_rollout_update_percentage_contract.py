@@ -32,21 +32,22 @@ def test_update_percentage_patch():
         headers["Authorization"] = "Bearer " + os.getenv("SKYRAMP_TEST_TOKEN")
 
     # Request Body
-    update-percentage_PATCH_request_body = r'''{
+    update_percentage_PATCH_request_body = r'''{
         "rollout_percentage": 75
     }'''
 
     # Execute Request
-    update-percentage_PATCH_response = client.send_request(
+    update_percentage_PATCH_response = client.send_request(
         url=URL,
         path="/api/v1/segment-rollouts/1/update-percentage/",
         method="PATCH",
-        body=update-percentage_PATCH_request_body,
+        body=update_percentage_PATCH_request_body,
         headers=headers
     )
 
     # Generated Assertions
-    assert update-percentage_PATCH_response.status_code == 200
+    assert update_percentage_PATCH_response.status_code == 200
+    assert "rollout_percentage" in skyramp.get_response_value(update_percentage_PATCH_response, "")
 
 
 if __name__ == "__main__":

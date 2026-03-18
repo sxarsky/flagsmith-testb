@@ -41,7 +41,7 @@ def test_segment_rollouts_get():
     }
 
     # Execute Request
-    segment-rollouts_GET_response = client.send_request(
+    segment_rollouts_GET_response = client.send_request(
         url=URL,
         path="/api/v1/segment-rollouts/",
         method="GET",
@@ -62,7 +62,7 @@ def test_segment_rollouts_get():
         query_params[key] = segment_rollouts_get_fuzzed_query[key]
 
         # Execute Request
-        segment-rollouts_GET_response = client.send_request(
+        segment_rollouts_GET_response = client.send_request(
             url=URL,
             path="/api/v1/segment-rollouts/",
             method="GET",
@@ -80,7 +80,7 @@ def test_segment_rollouts_get():
         query_params[key] = ""
 
         # Execute Request
-        segment-rollouts_GET_response = client.send_request(
+        segment_rollouts_GET_response = client.send_request(
             url=URL,
             path="/api/v1/segment-rollouts/",
             method="GET",

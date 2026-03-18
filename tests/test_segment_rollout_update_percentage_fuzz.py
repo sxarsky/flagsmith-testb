@@ -31,10 +31,10 @@ def test_update_percentage_patch():
         headers["Authorization"] = "Token " + os.getenv("SKYRAMP_TEST_TOKEN")
 
     # Request Body
-    update-percentage_PATCH_request_body = r'''{
+    update_percentage_PATCH_request_body = r'''{
       "rollout_percentage": 50
     }'''
-    
+
     # Fuzz strategies
     update_percentage_patch_fuzzed_body = {"rollout_percentage": -10}
     # Fuzz status codes
@@ -43,22 +43,22 @@ def test_update_percentage_patch():
     expected_update_percentage_patch_null_status_code = {"rollout_percentage": "40x"}
 
     # Execute Request
-    update-percentage_PATCH_response = client.send_request(
+    update_percentage_PATCH_response = client.send_request(
         url=URL,
         path="/api/v1/segment-rollouts/1/update-percentage/",
         method="PATCH",
-        body=update-percentage_PATCH_request_body,
+        body=update_percentage_PATCH_request_body,
         headers=headers,
         expected_code="20x"
     )
 
     for key in skyramp.iterate(update_percentage_patch_fuzzed_body):
         # Execute Request
-        update-percentage_PATCH_response = client.send_request(
+        update_percentage_PATCH_response = client.send_request(
             url=URL,
             path="/api/v1/segment-rollouts/1/update-percentage/",
             method="PATCH",
-            body=update-percentage_PATCH_request_body,
+            body=update_percentage_PATCH_request_body,
             headers=headers,
             data_override={key: skyramp.get_value(update_percentage_patch_fuzzed_body, key)},
             expected_code=skyramp.get_value(expected_update_percentage_patch_status_code, key),
@@ -66,11 +66,11 @@ def test_update_percentage_patch():
         )
 
         # Execute Request
-        update-percentage_PATCH_response = client.send_request(
+        update_percentage_PATCH_response = client.send_request(
             url=URL,
             path="/api/v1/segment-rollouts/1/update-percentage/",
             method="PATCH",
-            body=update-percentage_PATCH_request_body,
+            body=update_percentage_PATCH_request_body,
             headers=headers,
             data_override={key: None},
             expected_code=skyramp.get_value(expected_update_percentage_patch_null_status_code, key),
