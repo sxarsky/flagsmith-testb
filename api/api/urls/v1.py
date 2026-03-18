@@ -9,7 +9,11 @@ from environments.identities.traits.views import SDKTraits
 from environments.identities.views import SDKIdentities
 from environments.sdk.views import SDKEnvironmentAPIView
 from features.feature_health.views import feature_health_webhook
-from features.views import SDKFeatureStates, get_multivariate_options
+from features.views import (
+    FeatureChangeRequestViewSet,
+    SDKFeatureStates,
+    get_multivariate_options,
+)
 from integrations.github.views import github_webhook
 from organisations.views import chargebee_webhook
 
@@ -21,6 +25,9 @@ schema_view_permission_class = (  # pragma: no cover
 
 traits_router = routers.DefaultRouter()
 traits_router.register(r"", SDKTraits, basename="sdk-traits")
+
+change_requests_router = routers.DefaultRouter()
+change_requests_router.register(r"", FeatureChangeRequestViewSet, basename="change-request")
 
 app_name = "v1"
 
@@ -59,6 +66,7 @@ urlpatterns = [
     ),
     re_path(r"^identities/$", SDKIdentities.as_view(), name="sdk-identities"),
     re_path(r"^traits/", include(traits_router.urls), name="traits"),
+    re_path(r"^change-requests/", include(change_requests_router.urls), name="change-requests"),
     re_path(r"^analytics/flags/$", SDKAnalyticsFlags.as_view(), name="analytics-flags"),
     re_path(r"^analytics/telemetry/$", SelfHostedTelemetryAPIView.as_view()),
     re_path(
