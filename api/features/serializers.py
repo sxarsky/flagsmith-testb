@@ -763,6 +763,7 @@ class FeatureChangeRequestSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = [
             'id',
+            'requested_by',
             'status',
             'reviewed_by',
             'reviewed_at',
