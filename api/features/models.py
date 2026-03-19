@@ -1170,3 +1170,49 @@ class FeatureStateValue(
 
     def _get_environment(self) -> typing.Optional["Environment"]:
         return self.feature_state.environment
+
+
+class FeatureUsageMetrics(models.Model):
+    """
+    Tracks usage analytics for feature flags.
+    Teams can see which flags are actually being used and how often they're evaluated.
+    """
+    feature = models.ForeignKey(
+        Feature,
+        on_delete=models.CASCADE,
+        related_name='usage_metrics'
+    )
+    environment = models.ForeignKey(
+        'environments.Environment',
+        on_delete=models.CASCADE,
+        related_name='feature_usage_metrics'
+    )
+    evaluation_count = models.IntegerField(
+        default=0,
+        help_text="Total number of times this flag was evaluated"
+    )
+    unique_identities_count = models.IntegerField(
+        default=0,
+        help_text="Number of unique identities that evaluated this flag"
+    )
+    last_evaluated_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Timestamp of most recent evaluation"
+    )
+    period_start = models.DateTimeField(
+        help_text="Start of measurement period"
+    )
+    period_end = models.DateTimeField(
+        help_text="End of measurement period"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'feature_usage_metrics'
+        unique_together = [['feature', 'environment', 'period_start']]
+        ordering = ['-period_start']
+
+    def __str__(self):
+        return f"Usage for {self.feature.name} in {self.environment.name} - {self.evaluation_count} evals"
