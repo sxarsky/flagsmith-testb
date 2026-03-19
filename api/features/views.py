@@ -1162,9 +1162,15 @@ class SegmentRolloutViewSet(viewsets.ReadOnlyModelViewSet):  # type: ignore[type
         min_percentage = self.request.query_params.get('min_percentage')
         max_percentage = self.request.query_params.get('max_percentage')
         if min_percentage:
-            queryset = queryset.filter(rollout_percentage__gte=int(min_percentage))
+            try:
+                queryset = queryset.filter(rollout_percentage__gte=int(min_percentage))
+            except (ValueError, TypeError):
+                pass  # Ignore invalid min_percentage
         if max_percentage:
-            queryset = queryset.filter(rollout_percentage__lte=int(max_percentage))
+            try:
+                queryset = queryset.filter(rollout_percentage__lte=int(max_percentage))
+            except (ValueError, TypeError):
+                pass  # Ignore invalid max_percentage
 
         return queryset
 
