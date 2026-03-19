@@ -1,0 +1,80 @@
+[
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"environment\": 1, \"feature\": 1, \"justification\": \"Rolling back this feature due to performance concerns in production\", \"requested_change\": {\"enabled\": false}}",
+    "ResponseBody": "{\"id\": 99, \"feature\": 1, \"feature_name\": \"test_feature\", \"environment\": 1, \"environment_name\": \"Production\", \"requested_by\": 1, \"requested_by_email\": \"user@example.com\", \"requested_change\": {\"enabled\": false}, \"justification\": \"Rolling back this feature due to performance concerns in production\", \"status\": \"pending\", \"reviewed_by\": null, \"reviewed_by_email\": null, \"reviewed_at\": null, \"review_comment\": \"\", \"created_at\": \"2026-03-18T10:00:00Z\", \"updated_at\": \"2026-03-18T10:00:00Z\"}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Token SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "POST",
+    "Path": "/api/v1/change-requests/",
+    "QueryParams": {},
+    "StatusCode": 201,
+    "Port": 8000,
+    "Timestamp": "2026-03-18T17:01:41.591Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"review_comment\": \"Rejected - insufficient performance data provided\"}",
+    "ResponseBody": "{\"id\": 99, \"feature\": 1, \"feature_name\": \"test_feature\", \"environment\": 1, \"environment_name\": \"Production\", \"requested_by\": 1, \"requested_by_email\": \"user@example.com\", \"requested_change\": {\"enabled\": false}, \"justification\": \"Rolling back this feature due to performance concerns in production\", \"status\": \"rejected\", \"reviewed_by\": 1, \"reviewed_by_email\": \"reviewer@example.com\", \"reviewed_at\": \"2026-03-18T10:01:00Z\", \"review_comment\": \"Rejected - insufficient performance data provided\", \"created_at\": \"2026-03-18T10:00:00Z\", \"updated_at\": \"2026-03-18T10:01:00Z\"}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Token SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "POST",
+    "Path": "/api/v1/change-requests/99/reject/",
+    "QueryParams": {},
+    "StatusCode": 200,
+    "Port": 8000,
+    "Timestamp": "2026-03-18T17:01:54.482Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"review_comment\": \"Attempting to reject again\"}",
+    "ResponseBody": "{\"error\": \"Only pending requests can be rejected\"}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Token SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "POST",
+    "Path": "/api/v1/change-requests/99/reject/",
+    "QueryParams": {},
+    "StatusCode": 400,
+    "Port": 8000,
+    "Timestamp": "2026-03-18T17:02:03.753Z",
+    "Scheme": "http"
+  }
+]
