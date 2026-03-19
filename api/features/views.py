@@ -1143,20 +1143,32 @@ class FeatureUsageMetricsViewSet(viewsets.ModelViewSet):  # type: ignore[type-ar
         # Filter by feature if provided
         feature_id = self.request.query_params.get('feature_id')
         if feature_id:
-            queryset = queryset.filter(feature_id=feature_id)
+            try:
+                queryset = queryset.filter(feature_id=int(feature_id))
+            except (ValueError, TypeError):
+                pass  # Ignore invalid feature_id
 
         # Filter by environment if provided
         environment_id = self.request.query_params.get('environment_id')
         if environment_id:
-            queryset = queryset.filter(environment_id=environment_id)
+            try:
+                queryset = queryset.filter(environment_id=int(environment_id))
+            except (ValueError, TypeError):
+                pass  # Ignore invalid environment_id
 
         # Filter by date range
         from_date = self.request.query_params.get('from_date')
         to_date = self.request.query_params.get('to_date')
         if from_date:
-            queryset = queryset.filter(period_start__gte=from_date)
+            try:
+                queryset = queryset.filter(period_start__gte=from_date)
+            except (ValueError, TypeError):
+                pass  # Ignore invalid from_date
         if to_date:
-            queryset = queryset.filter(period_end__lte=to_date)
+            try:
+                queryset = queryset.filter(period_end__lte=to_date)
+            except (ValueError, TypeError):
+                pass  # Ignore invalid to_date
 
         return queryset
 
