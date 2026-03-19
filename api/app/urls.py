@@ -44,6 +44,11 @@ if not settings.TASK_PROCESSOR_MODE:
             name="project_overrides",
         ),
         path(
+            "api/v1/test-validation-endpoint/",
+            views.test_validation_endpoint,
+            name="test_validation_endpoint",
+        ),
+        path(
             "robots.txt",
             TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
         ),
