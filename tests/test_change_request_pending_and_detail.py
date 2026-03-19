@@ -51,10 +51,9 @@ def test_integration():
     # Execute Request
     endpoint_2_GET_response = client.send_request(
         url=URL_localhost,
-        path="/api/v1/change-requests/{change-requests}/",
+        path="/api/v1/change-requests/pending/",
         method="GET",
-        headers=headers,
-        path_params={"change-requests": skyramp.get_response_value(endpoint_1_POST_response, "id")}
+        headers=headers
     )
     # Generated Assertions
     assert endpoint_2_GET_response.status_code == 200
