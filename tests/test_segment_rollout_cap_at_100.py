@@ -49,7 +49,7 @@ def test_integration():
         method="PATCH",
         body=endpoint_3_PATCH_request_body,
         headers=headers,
-        path_params={"segment-rollouts": skyramp.get_response_value(endpoint_1_GET_response, "0.id")}
+        path_params={"segment-rollouts": skyramp.get_response_value(endpoint_1_GET_response, "results.0.id")}
     )
     # Generated Assertions
     assert endpoint_3_PATCH_response.status_code == 200

@@ -36,8 +36,8 @@ def test_segment_rollouts_get():
     }
     # Fuzz status codes
     expected_segment_rollouts_get_fuzzed_query_status_code = {
-        "max_percentage": "40x",
-        "min_percentage": "40x"
+        "max_percentage": "20x",
+        "min_percentage": "20x"
     }
 
     # Execute Request

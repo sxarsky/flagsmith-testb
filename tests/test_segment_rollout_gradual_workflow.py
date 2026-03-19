@@ -36,8 +36,8 @@ def test_integration():
     )
     # Generated Assertions
     assert endpoint_1_GET_response.status_code == 200
-    assert "rollout_percentage" in skyramp.get_response_value(endpoint_1_GET_response, "0")
-    assert "rollout_strategy" in skyramp.get_response_value(endpoint_1_GET_response, "0")
+    assert "rollout_percentage" in skyramp.get_response_value(endpoint_1_GET_response, "results.0")
+    assert "rollout_strategy" in skyramp.get_response_value(endpoint_1_GET_response, "results.0")
 
     # Execute Request
     endpoint_2_GET_response = client.send_request(
@@ -45,7 +45,7 @@ def test_integration():
         path="/api/v1/segment-rollouts/{segment-rollouts}/",
         method="GET",
         headers=headers,
-        path_params={"segment-rollouts": skyramp.get_response_value(endpoint_1_GET_response, "0.id")}
+        path_params={"segment-rollouts": skyramp.get_response_value(endpoint_1_GET_response, "results.0.id")}
     )
     # Generated Assertions
     assert endpoint_2_GET_response.status_code == 200

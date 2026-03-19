@@ -46,7 +46,7 @@ def test_integration():
     )
     # Generated Assertions
     assert endpoint_1_GET_1_response.status_code == 200
-    first_item = skyramp.get_response_value(endpoint_1_GET_1_response, "0")
+    first_item = skyramp.get_response_value(endpoint_1_GET_1_response, "results.0")
     if first_item is not None:
         assert "rollout_percentage" in first_item
 
