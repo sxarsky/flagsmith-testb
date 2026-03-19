@@ -1,0 +1,80 @@
+[
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"feature\": 1, \"environment\": 1, \"requested_change\": {\"enabled\": false}, \"justification\": \"Disabling this feature to investigate performance regressions in production\"}",
+    "ResponseBody": "{\"id\": 20, \"feature\": 1, \"feature_name\": \"my_feature\", \"environment\": 1, \"environment_name\": \"Production\", \"requested_by\": 1, \"requested_by_email\": \"user@example.com\", \"requested_change\": {\"enabled\": false}, \"justification\": \"Disabling this feature to investigate performance regressions in production\", \"status\": \"pending\", \"reviewed_by\": null, \"reviewed_by_email\": null, \"reviewed_at\": null, \"review_comment\": \"\", \"created_at\": \"2024-01-01T00:00:00Z\", \"updated_at\": \"2024-01-01T00:00:00Z\"}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Token SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "POST",
+    "Path": "/api/v1/change-requests/",
+    "QueryParams": {},
+    "StatusCode": 201,
+    "Port": 8000,
+    "Timestamp": "2026-03-16T23:07:39.913Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "",
+    "ResponseBody": "[{\"id\": 20, \"feature\": 1, \"feature_name\": \"my_feature\", \"environment\": 1, \"environment_name\": \"Production\", \"requested_by\": 1, \"requested_by_email\": \"user@example.com\", \"requested_change\": {\"enabled\": false}, \"justification\": \"Disabling this feature to investigate performance regressions in production\", \"status\": \"pending\", \"reviewed_by\": null, \"reviewed_by_email\": null, \"reviewed_at\": null, \"review_comment\": \"\", \"created_at\": \"2024-01-01T00:00:00Z\", \"updated_at\": \"2024-01-01T00:00:00Z\"}]",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Token SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "GET",
+    "Path": "/api/v1/change-requests/pending/",
+    "QueryParams": {},
+    "StatusCode": 200,
+    "Port": 8000,
+    "Timestamp": "2026-03-16T23:07:51.816Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "",
+    "ResponseBody": "{\"id\": 20, \"feature\": 1, \"feature_name\": \"my_feature\", \"environment\": 1, \"environment_name\": \"Production\", \"requested_by\": 1, \"requested_by_email\": \"user@example.com\", \"requested_change\": {\"enabled\": false}, \"justification\": \"Disabling this feature to investigate performance regressions in production\", \"status\": \"pending\", \"reviewed_by\": null, \"reviewed_by_email\": null, \"reviewed_at\": null, \"review_comment\": \"\", \"created_at\": \"2024-01-01T00:00:00Z\", \"updated_at\": \"2024-01-01T00:00:00Z\"}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        "Token SKYRAMP_PLACEHOLDER_TOKEN"
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "GET",
+    "Path": "/api/v1/change-requests/20/",
+    "QueryParams": {},
+    "StatusCode": 200,
+    "Port": 8000,
+    "Timestamp": "2026-03-16T23:07:58.493Z",
+    "Scheme": "http"
+  }
+]
