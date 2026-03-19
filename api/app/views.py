@@ -63,3 +63,15 @@ def project_overrides(request: Request) -> HttpResponse:
         content="window.projectOverrides = " + json.dumps(override_data),
         content_type="application/javascript",
     )
+
+
+def test_validation_endpoint(request: Request) -> HttpResponse:
+    """
+    Test endpoint for SKYR-3647 validation.
+    This endpoint has hyphens in its URL path to verify that testbot
+    generates valid Python variable names (underscores, not hyphens).
+    """
+    return HttpResponse(
+        content=json.dumps({"status": "ok", "validation": "SKYR-3647"}),
+        content_type="application/json",
+    )
