@@ -1,0 +1,80 @@
+[
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"feature\": 1, \"evaluation_limit\": 5000, \"limit_exceeded_action\": \"alert\", \"reset_date\": \"2026-04-01\"}",
+    "ResponseBody": "{\"id\": 10, \"feature\": 1, \"feature_name\": \"test_feature\", \"evaluation_limit\": 5000, \"current_count\": 0, \"reset_date\": \"2026-04-01\", \"limit_exceeded_action\": \"alert\", \"limit_exceeded\": false, \"usage_percentage\": 0.0, \"remaining_evaluations\": 5000, \"created_at\": \"2026-03-11T14:00:00Z\", \"updated_at\": \"2026-03-11T14:00:00Z\"}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        ""
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "POST",
+    "Path": "/api/v1/budgets/",
+    "QueryParams": {},
+    "StatusCode": 201,
+    "Port": 8080,
+    "Timestamp": "2026-03-11T14:06:37.016Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"feature\": 1, \"evaluation_limit\": 8000, \"limit_exceeded_action\": \"disable\", \"reset_date\": \"2026-04-01\"}",
+    "ResponseBody": "{\"id\": 10, \"feature\": 1, \"feature_name\": \"test_feature\", \"evaluation_limit\": 8000, \"current_count\": 0, \"reset_date\": \"2026-04-01\", \"limit_exceeded_action\": \"disable\", \"limit_exceeded\": false, \"usage_percentage\": 0.0, \"remaining_evaluations\": 8000, \"created_at\": \"2026-03-11T14:00:00Z\", \"updated_at\": \"2026-03-11T14:01:00Z\"}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        ""
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "PUT",
+    "Path": "/api/v1/budgets/10/",
+    "QueryParams": {},
+    "StatusCode": 200,
+    "Port": 8080,
+    "Timestamp": "2026-03-11T14:06:50.787Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "",
+    "ResponseBody": "{\"id\": 10, \"feature\": 1, \"feature_name\": \"test_feature\", \"evaluation_limit\": 8000, \"current_count\": 0, \"reset_date\": \"2026-04-01\", \"limit_exceeded_action\": \"disable\", \"limit_exceeded\": false, \"usage_percentage\": 0.0, \"remaining_evaluations\": 8000, \"created_at\": \"2026-03-11T14:00:00Z\", \"updated_at\": \"2026-03-11T14:01:00Z\"}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        ""
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "GET",
+    "Path": "/api/v1/budgets/10/",
+    "QueryParams": {},
+    "StatusCode": 200,
+    "Port": 8080,
+    "Timestamp": "2026-03-11T14:06:57.706Z",
+    "Scheme": "http"
+  }
+]

@@ -70,6 +70,7 @@ from webhooks.webhooks import WebhookEventType
 from .constants import INTERSECTION, UNION
 from .features_service import get_overrides_data
 from .models import Feature, FeatureSegment, FeatureState
+from .budgets.models import FeatureBudget
 from .multivariate.serializers import (
     FeatureMVOptionsValuesResponseSerializer,
 )
@@ -961,19 +962,48 @@ class SDKFeatureStates(GenericAPIView):  # type: ignore[type-arg]
                     status=status.HTTP_404_NOT_FOUND,
                 )
 
+            # Track budget usage for the evaluated feature
+            try:
+                budget = FeatureBudget.objects.select_for_update().get(
+                    feature=feature_states[0].feature
+                )
+                budget.check_and_reset_if_needed()
+                budget.increment_count()
+            except FeatureBudget.DoesNotExist:
+                # No budget configured for this feature
+                pass
+
             return Response(self.get_serializer(feature_states[0]).data)
 
         if settings.CACHE_FLAGS_SECONDS > 0:
             data = self._get_flags_from_cache(request.environment, from_replica=True)
+            feature_states = get_environment_flags_list(
+                environment=request.environment,
+                additional_filters=self._additional_filters,
+                from_replica=True,
+            )
         else:
+            feature_states = get_environment_flags_list(
+                environment=request.environment,
+                additional_filters=self._additional_filters,
+                from_replica=True,
+            )
             data = self.get_serializer(
-                get_environment_flags_list(
-                    environment=request.environment,
-                    additional_filters=self._additional_filters,
-                    from_replica=True,
-                ),
+                feature_states,
                 many=True,
             ).data
+
+        # Track budget usage for all evaluated features
+        for feature_state in feature_states:
+            try:
+                budget = FeatureBudget.objects.select_for_update().get(
+                    feature=feature_state.feature
+                )
+                budget.check_and_reset_if_needed()
+                budget.increment_count()
+            except FeatureBudget.DoesNotExist:
+                # No budget configured for this feature
+                pass
 
         updated_at = self.request.environment.updated_at
         return Response(

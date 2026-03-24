@@ -1,0 +1,106 @@
+[
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{\"feature\": 1, \"evaluation_limit\": 1000, \"limit_exceeded_action\": \"alert\", \"reset_date\": \"2026-04-01\"}",
+    "ResponseBody": "{\"id\": 1, \"feature\": 1, \"feature_name\": \"test_feature\", \"evaluation_limit\": 1000, \"current_count\": 0, \"reset_date\": \"2026-04-01\", \"limit_exceeded_action\": \"alert\", \"limit_exceeded\": false, \"usage_percentage\": 0.0, \"remaining_evaluations\": 1000, \"created_at\": \"2026-03-11T13:00:00Z\", \"updated_at\": \"2026-03-11T13:00:00Z\"}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        ""
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "POST",
+    "Path": "/api/v1/budgets/",
+    "QueryParams": {},
+    "StatusCode": 201,
+    "Port": 8080,
+    "Timestamp": "2026-03-11T13:16:01.330Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "",
+    "ResponseBody": "{\"id\": 1, \"feature_name\": \"test_feature\", \"evaluation_limit\": 1000, \"current_count\": 0, \"usage_percentage\": 0.0, \"remaining_evaluations\": 1000, \"limit_exceeded\": false, \"reset_date\": \"2026-04-01\", \"days_until_reset\": 21, \"limit_exceeded_action\": \"alert\"}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        ""
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "GET",
+    "Path": "/api/v1/budgets/1/status/",
+    "QueryParams": {},
+    "StatusCode": 200,
+    "Port": 8080,
+    "Timestamp": "2026-03-11T13:16:19.434Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "{}",
+    "ResponseBody": "{\"id\": 1, \"feature\": 1, \"feature_name\": \"test_feature\", \"evaluation_limit\": 1000, \"current_count\": 0, \"reset_date\": \"2026-04-01\", \"limit_exceeded_action\": \"alert\", \"limit_exceeded\": false, \"usage_percentage\": 0.0, \"remaining_evaluations\": 1000, \"created_at\": \"2026-03-11T13:00:00Z\", \"updated_at\": \"2026-03-11T13:00:00Z\"}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        ""
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "POST",
+    "Path": "/api/v1/budgets/1/reset/",
+    "QueryParams": {},
+    "StatusCode": 200,
+    "Port": 8080,
+    "Timestamp": "2026-03-11T13:16:33.420Z",
+    "Scheme": "http"
+  },
+  {
+    "Source": "192.168.65.1:39998",
+    "Destination": "localhost",
+    "RequestBody": "",
+    "ResponseBody": "{}",
+    "RequestHeaders": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Authorization": [
+        ""
+      ]
+    },
+    "ResponseHeaders": {
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "Method": "DELETE",
+    "Path": "/api/v1/budgets/1/",
+    "QueryParams": {},
+    "StatusCode": 204,
+    "Port": 8080,
+    "Timestamp": "2026-03-11T13:16:53.072Z",
+    "Scheme": "http"
+  }
+]
